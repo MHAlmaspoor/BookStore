@@ -31,7 +31,8 @@
 //         .ToArray();
 //     return forecast;
 // })
-// .WithName("GetWeatherForecast");
+// .WithName
+// ("GetWeatherForecast");
 
 // app.Run();
 
@@ -41,24 +42,33 @@
 // }
 
 //=====>  .net 9 Template
-var builder = WebApplication.CreateBuilder(args);
+// var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// // builder.Services.AddEndpointsApiExplorer();
+// // builder.Services.AddSwaggerGen();
+// builder.Services.AddPresentation();
+// builder.Services.AddApplication();
+// builder.Services.AddInfrastructure(builder.Configuration);
+// var app = builder.Build();
 
-var app = builder.Build();
+// if (app.Environment.IsDevelopment())
+// {
+//     app.UseSwagger();
+//     app.UseSwaggerUI();
+// }
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// app.UseHttpsRedirection();
 
-app.UseHttpsRedirection();
+// app.MapGet("/weatherforecast", () =>
+// {
+//     return "Hello";
+// });
 
-app.MapGet("/weatherforecast", () =>
-{
-    return "Hello";
-});
+// app.Run();
 
+using BookStore.ProductService.Api.Extensions;
+var builder=WebApplication.CreateBuilder(args);
+builder.Services.AddPresentation();
+var app=builder.Build();
+app.UsePresentation();
 app.Run();

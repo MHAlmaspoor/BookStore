@@ -1,0 +1,25 @@
+using BookStore.ProductServicec.Domain.Exceptions;
+using BookStore.ProductServicec.Domain.Common;
+
+namespace BookStore.ProductServicec.Domain.ValueObjects;
+
+public sealed class Money:ValueObject
+{
+    public decimal Amount { get; }
+    public string Currency { get; }
+
+    public Money(decimal amount,string currency)
+    {
+        if(amount<0)
+            throw new DomainException("Amount cannot be negetive. ");
+        if(string.IsNullOrWhiteSpace(currency))
+            throw new DomainException("Currency is required. ");
+        Amount=amount;
+        Currency=currency.ToUpperInvariant();
+    }
+    protected override IEnumerable<object?> GetEqualityComponents()
+    {
+        yield return Amount;
+        yield return Currency;
+    }
+}
