@@ -7,4 +7,7 @@
     <Project Path="src/Services/ProductService/BookStore.ProductService.Domain/BookStore.ProductService.Domain.csproj" />
     <Project Path="src/Services/ProductService/BookStore.ProductService.Infrastructure/BookStore.ProductService.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/BookStore.ProductService.Domain.Tests/BookStore.ProductService.Domain.Tests.csproj" />
+  </Folder>
 </Solution>

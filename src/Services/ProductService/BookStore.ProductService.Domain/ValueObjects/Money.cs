@@ -11,7 +11,7 @@ public sealed class Money:ValueObject
     public Money(decimal amount,string currency)
     {
         if(amount<0)
-            throw new DomainException("Amount cannot be negetive. ");
+            throw new DomainException(DomainErrors.Money.NegativeAmount);
         if(string.IsNullOrWhiteSpace(currency))
             throw new DomainException("Currency is required. ");
         Amount=amount;
