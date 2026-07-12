@@ -4,52 +4,66 @@ using BookStore.ProductServicec.Domain.ValueObjects;
 namespace BookStore.ProductServicec.Domain.Products;
 public sealed class Product:AggregatedRoot
 {
-    public string? Name { get; private set; }=null;
-    public Money? Price { get; private set; }=null;
-    public bool IsActive { get; set; }=true;
+    public string Name { get; private set; }
+    public Money Price { get; private set; }
+    public bool IsActive { get; private set; }=true;
 
-    public Product()
-    {
+    // public Product()
+    // {
 
-    }
+    // }
     public Product(string name,Money price)
     {
-        ValidateName(name);
-        Name=name.Trim();
-        ChangePrice(price);
+        SetInitialName(name);
+        SetInitialPrice(price);
         AddDomainEvent(new ProductCreatedEvent(Id));
     }
     public void Rename(string name)
     {
+        ValidateName(name);
         Name=name.Trim();
-        Name=name;
+        AddDomainEvent(new ProductRenamedEvent(Id));
     }
     public void ChangePrice(Money newPrice)
     {
+        ArgumentNullException.ThrowIfNull(newPrice);
+
         if(!IsActive)
             throw new DomainException(DomainErrors.Product.InactiveProductCannotChange);
-        ArgumentNullException.ThrowIfNull(newPrice);
+
         if(Price==newPrice)
             return;
         Price=newPrice;
+        AddDomainEvent(new ProductPriceChangedEvent(Id));
     }
-    public static void ValidateName(string name)
+    private static void ValidateName(string name)
     {
         if(string.IsNullOrWhiteSpace(name))
             throw new DomainException(DomainErrors.Product.NameIsRequired);
         if(name.Length>200)
             throw new DomainException(DomainErrors.Product.NameTooLong);
     }
-    public void Active()
+    public void Activate()
     {
         if(IsActive)
             return;
         IsActive=true;
     }
-    public void DeActive()
+    public void Deactivate()
     {
         if(!IsActive)
             return;
         IsActive=false;
+    }
+    private void SetInitialPrice(Money price)
+    {
+        ArgumentNullException.ThrowIfNull(price);
+
+        Price = price;
+    }
+    private void SetInitialName(string name)
+    {
+        ValidateName(name);
+        Name=name.Trim();
     }
 }
