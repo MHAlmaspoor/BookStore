@@ -14,11 +14,13 @@ public static class DomainErrors
         public const string InactiveProductCannotChange=
             "Inactive products cannot chance price. ";
 
-
     }
     public static class Money
     {
         public const string NegativeAmount =
             "Amount cannot be negetive. ";
+
+        public const string InvalidCurrency=
+            "Currency is not currect. ";
     }
 }

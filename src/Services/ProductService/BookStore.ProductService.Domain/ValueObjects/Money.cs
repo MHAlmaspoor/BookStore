@@ -15,7 +15,9 @@ public sealed class Money:ValueObject
         if(string.IsNullOrWhiteSpace(currency))
             throw new DomainException("Currency is required. ");
         Amount=amount;
-        Currency=currency.ToUpperInvariant();
+        if(currency.Trim().Length!=3)
+            throw new DomainException(DomainErrors.Money.InvalidCurrency);
+        Currency=currency.Trim().ToUpperInvariant();
     }
     protected override IEnumerable<object?> GetEqualityComponents()
     {

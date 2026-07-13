@@ -8,10 +8,10 @@ public sealed class Product:AggregatedRoot
     public Money Price { get; private set; }
     public bool IsActive { get; private set; }=true;
 
-    // public Product()
-    // {
+    private Product()
+    {
 
-    // }
+    }
     public Product(string name,Money price)
     {
         SetInitialName(name);
