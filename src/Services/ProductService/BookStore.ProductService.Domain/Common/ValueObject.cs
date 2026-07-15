@@ -1,4 +1,4 @@
-namespace BookStore.ProductServicec.Domain.Common;
+namespace BookStore.ProductService.Domain.Common;
 
 public abstract class ValueObject
 {

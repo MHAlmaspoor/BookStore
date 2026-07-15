@@ -1,7 +1,8 @@
-using BookStore.ProductServicec.Domain.Common;
-using BookStore.ProductServicec.Domain.Exceptions;
-using BookStore.ProductServicec.Domain.ValueObjects;
-namespace BookStore.ProductServicec.Domain.Products;
+using BookStore.ProductService.Domain.Common;
+using BookStore.ProductService.Domain.Exceptions;
+using BookStore.ProductService.Domain.ValueObjects;
+
+namespace BookStore.ProductService.Domain.Products;
 public sealed class Product:AggregatedRoot
 {
     public string Name { get; private set; }

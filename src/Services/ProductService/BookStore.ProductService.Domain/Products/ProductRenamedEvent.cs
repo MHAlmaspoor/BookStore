@@ -1,6 +1,6 @@
-using BookStore.ProductServicec.Domain.Events;
+using BookStore.ProductService.Domain.Events;
 
-namespace BookStore.ProductServicec.Domain.Products;
+namespace BookStore.ProductService.Domain.Products;
 
 public sealed class ProductRenamedEvent:IDomainEvent
 {

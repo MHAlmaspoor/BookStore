@@ -1,5 +1,5 @@
 
-namespace BookStore.ProductServicec.Domain.Common;
+namespace BookStore.ProductService.Domain.Common;
 
 public static class DomainErrors
 {

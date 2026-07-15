@@ -1,7 +1,7 @@
-using BookStore.ProductServicec.Domain.Exceptions;
-using BookStore.ProductServicec.Domain.Common;
+using BookStore.ProductService.Domain.Exceptions;
+using BookStore.ProductService.Domain.Common;
 
-namespace BookStore.ProductServicec.Domain.ValueObjects;
+namespace BookStore.ProductService.Domain.ValueObjects;
 
 public sealed class Money:ValueObject
 {

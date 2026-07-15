@@ -1,6 +1,6 @@
-using BookStore.ProductServicec.Application.Abstraction;
-using BookStore.ProductServicec.Application.Products.Command.CreateProduct;
-using BookStore.ProductServicec.Domain.Products;
+using BookStore.ProductService.Application.Abstraction.Persistance;
+using BookStore.ProductService.Application.Products.Command.CreateProduct;
+using BookStore.ProductService.Domain.Products;
 using Moq;
 
 namespace BookStore.ProductService.Application.Tests.Products.Commands.CreateProduct;

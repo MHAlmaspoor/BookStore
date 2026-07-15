@@ -1,4 +1,4 @@
-namespace BookStore.ProductServicec.Domain.Common;
+namespace BookStore.ProductService.Domain.Common;
 public abstract class Entity:IEquatable<Entity>
 {
     public Guid Id{get; protected set;}

@@ -1,7 +1,7 @@
-using BookStore.ProductServicec.Application.Abstraction;
-using BookStore.ProductServicec.Application.Products.Command.CreateProduct;
-using BookStore.ProductServicec.Domain.Products;
-using BookStore.ProductServicec.Domain.ValueObjects;
+using BookStore.ProductService.Application.Abstraction.Persistance;
+using BookStore.ProductService.Application.Products.Command.CreateProduct;
+using BookStore.ProductService.Domain.Products;
+using BookStore.ProductService.Domain.ValueObjects;
 using MediatR;
 
 public sealed class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Guid>

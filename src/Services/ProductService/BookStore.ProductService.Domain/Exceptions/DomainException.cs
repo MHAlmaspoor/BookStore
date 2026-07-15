@@ -1,4 +1,4 @@
-namespace BookStore.ProductServicec.Domain.Exceptions;
+namespace BookStore.ProductService.Domain.Exceptions;
 
 public sealed class DomainException: Exception
 {

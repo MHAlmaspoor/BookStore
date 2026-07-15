@@ -1,6 +1,6 @@
-using BookStore.ProductServicec.Domain.Common;
-using BookStore.ProductServicec.Domain.Exceptions;
-using BookStore.ProductServicec.Domain.ValueObjects;
+using BookStore.ProductService.Domain.Common;
+using BookStore.ProductService.Domain.Exceptions;
+using BookStore.ProductService.Domain.ValueObjects;
 
 namespace BookStore.ProductService.Domain.Tests.ValueObjects;
 

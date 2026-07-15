@@ -1,4 +1,4 @@
-using BookStore.ProductServicec.Domain.Products;
+using BookStore.ProductService.Domain.Products;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.ProductService.Infrastructure.Persistence;

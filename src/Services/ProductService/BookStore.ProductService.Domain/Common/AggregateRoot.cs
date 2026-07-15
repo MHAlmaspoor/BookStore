@@ -1,8 +1,8 @@
-using BookStore.ProductServicec.Domain.Events;
+using BookStore.ProductService.Domain.Events;
 
-namespace BookStore.ProductServicec.Domain.Common;
+namespace BookStore.ProductService.Domain.Common;
 
-public abstract class AggregatedRoot:Entity
+public abstract class AggregatedRoot:Entity, IHasDomainEvent
 {
     private readonly List<IDomainEvent> _domainEvents=new ();
     public IReadOnlyCollection<IDomainEvent> DomainEvents =>_domainEvents.AsReadOnly();

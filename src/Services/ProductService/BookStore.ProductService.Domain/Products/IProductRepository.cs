@@ -1,4 +1,4 @@
-namespace BookStore.ProductServicec.Domain.Products;
+namespace BookStore.ProductService.Domain.Products;
 
 public interface IProductRepository
 {

@@ -1,4 +1,4 @@
-using BookStore.ProductServicec.Domain.Products;
+using BookStore.ProductService.Domain.Products;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
