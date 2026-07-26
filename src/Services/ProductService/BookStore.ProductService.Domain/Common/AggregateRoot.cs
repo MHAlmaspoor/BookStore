@@ -2,7 +2,7 @@ using BookStore.ProductService.Domain.Events;
 
 namespace BookStore.ProductService.Domain.Common;
 
-public abstract class AggregatedRoot:Entity, IHasDomainEvent
+public abstract class AggregatedRoot:Entity, IAggregateRoot
 {
     private readonly List<IDomainEvent> _domainEvents=new ();
     public IReadOnlyCollection<IDomainEvent> DomainEvents =>_domainEvents.AsReadOnly();

@@ -1,6 +1,9 @@
 <Solution>
   <Folder Name="/src/" />
   <Folder Name="/src/Services/" />
+  <Folder Name="/src/Services/NotificationService/">
+    <Project Path="src/Services/NotificationService/BookStore.NotificationService.csproj" />
+  </Folder>
   <Folder Name="/src/Services/ProductService/">
     <Project Path="src/Services/ProductService/BookStore.ProductService.Api/BookStore.ProductService.Api.csproj" />
     <Project Path="src/Services/ProductService/BookStore.ProductService.Application/BookStore.ProductService.Application.csproj" />

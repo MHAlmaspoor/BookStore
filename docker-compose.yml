@@ -1,0 +1,44 @@
+services:
+
+  postgres:
+
+    image: postgres:17
+
+    container_name: bookstore-postgres
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: bookstore-rabbitmq
+
+    restart: unless-stopped
+
+    environment:
+        RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+        RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+
+    ports:
+      - "5762:5762"
+      - "15672:15672"
+    networks:
+      - bookstore-network
+volumes:
+
+  postgres_data:
+
+networks:
+  bookstore-network:
+    driver: bridge
+

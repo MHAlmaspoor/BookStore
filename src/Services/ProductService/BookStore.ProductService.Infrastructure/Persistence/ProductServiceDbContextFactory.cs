@@ -10,7 +10,7 @@ public sealed class ProductServiceDbContextFactory
     {
         var optionBuilder = new DbContextOptionsBuilder<ProductServiceDbContext>();
 
-        optionBuilder.UseNpgsql("host=localhost;port=5432;Database=BookStore_ProductService;username=postgresql,password=1");
+        optionBuilder.UseNpgsql("host=localhost;port=5432;Database=BookStoreProductDb;username=postgres;password=1");
 
         return new ProductServiceDbContext(optionBuilder.Options);
     }

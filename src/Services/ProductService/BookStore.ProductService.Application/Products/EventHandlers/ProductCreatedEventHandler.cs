@@ -6,9 +6,9 @@ namespace BookStore.ProductService.Application.Products.EventHandlers;
 
 public sealed class ProductCreatedEventHandler: INotificationHandler<ProductCreatedEvent>
 {
-    private readonly ILogger<ProductCreatedEvent> _logger;
+    private readonly ILogger<ProductCreatedEventHandler> _logger;
 
-    public ProductCreatedEventHandler(ILogger<ProductCreatedEvent> logger)
+    public ProductCreatedEventHandler(ILogger<ProductCreatedEventHandler> logger)
     {
         _logger=logger;
     }

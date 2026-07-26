@@ -1,0 +1,21 @@
+using BookStore.ProductService.Application.Abstraction.Messaging;
+using BookStore.ProductService.Application.Events.Integration;
+using BookStore.ProductService.Domain.Events;
+using BookStore.ProductService.Domain.Products;
+
+public sealed class IntegrationEventMapper: IIntegrationEventMapper
+{
+    public IntegrationEvent? Map(IDomainEvent domainEvent)
+    {
+        return domainEvent switch
+        {
+            ProductCreatedEvent e=> new ProductCreatedIntegrationEvent(
+                e.ProductId,
+                "",
+                0,
+                ""
+            ),
+            _ =>null
+        };
+    }
+}
