@@ -1,16 +1,26 @@
+using BookStore.NotificationService.Messaging;
+
 namespace BookStore.NotificationService;
 
-public class Worker(ILogger<Worker> logger) : BackgroundService
+public class Worker : BackgroundService
 {
+    private readonly ILogger<Worker> _logger;
+    private readonly RabbitMqConnection _connection;
+    private readonly ProductCreatedConsumer _consumer;
+
+    public  Worker(ILogger<Worker> logger, RabbitMqConnection connection, ProductCreatedConsumer consumer)
+    {
+        _logger=logger;
+        _connection=connection;
+        _consumer=consumer;
+    }
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            if (logger.IsEnabled(LogLevel.Information))
-            {
-                logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-            }
-            await Task.Delay(1000, stoppingToken);
-        }
+        _logger.LogInformation("Notification Service Started");
+
+        await _consumer.StartAsync(stoppingToken);
+
+        await Task.Delay(Timeout.Infinite, stoppingToken);
+
     }
 }

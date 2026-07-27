@@ -30,7 +30,7 @@ services:
         RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
 
     ports:
-      - "5762:5762"
+      - "5672:5672"
       - "15672:15672"
     networks:
       - bookstore-network
