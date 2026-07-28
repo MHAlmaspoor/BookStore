@@ -17,7 +17,7 @@ public sealed class Product:AggregatedRoot
     {
         SetInitialName(name);
         SetInitialPrice(price);
-        AddDomainEvent(new ProductCreatedEvent(Id));
+        AddDomainEvent(new ProductCreatedEvent(Id,Name, price.Amount, price.Currency));
     }
     public void Rename(string name)
     {

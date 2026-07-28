@@ -70,7 +70,7 @@ using BookStore.ProductService.Api.Extensions;
 using BookStore.ProductService.Application;
 using BookStore.ProductService.Infrastructure;
 var builder=WebApplication.CreateBuilder(args);
-builder.Services.addApplication();
+builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPresentation();
 builder.Services.AddControllers();

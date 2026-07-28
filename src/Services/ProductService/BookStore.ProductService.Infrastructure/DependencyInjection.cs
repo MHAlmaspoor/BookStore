@@ -19,8 +19,8 @@ public static class DependenctInjection
     {
         services.AddSingleton<IEventBus,RabbitMqEventBus>();
         services.Configure<RabbitMqOptions>(
-    configuration.GetSection(RabbitMqOptions.SectionName));
-services.AddSingleton<RabbitMqConnection>(sp =>
+        configuration.GetSection(RabbitMqOptions.SectionName));
+    services.AddSingleton<IRabbitMqConnection>(sp =>
 {
     var settings = sp
         .GetRequiredService<IOptions<RabbitMqOptions>>()
@@ -34,7 +34,6 @@ services.AddSingleton<RabbitMqConnection>(sp =>
         Password = settings.Password,
 
         AutomaticRecoveryEnabled = true,
-
         RequestedHeartbeat = TimeSpan.FromSeconds(30)
     };
 
@@ -45,14 +44,11 @@ services.AddSingleton<RabbitMqConnection>(sp =>
 
     return new RabbitMqConnection(connection);
 });
-
         services.AddScoped<PublishDomainEventInterceptor>();
         services.AddDbContext<ProductServiceDbContext>((sp, option)=>
         {
             option.UseNpgsql(
             configuration.GetConnectionString("ProductDatabase"));
-
-            option.AddInterceptors(sp.GetRequiredService<PublishDomainEventInterceptor>());
 
             option.AddInterceptors(sp.GetRequiredService<PublishDomainEventInterceptor>());
 
@@ -64,6 +60,8 @@ services.AddSingleton<RabbitMqConnection>(sp =>
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<PublishDomainEventInterceptor>();
+
+        services.AddScoped<IIntegrationEventMapper,IntegrationEventMapper>();
         return services;
 
     }

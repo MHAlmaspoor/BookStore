@@ -11,11 +11,11 @@ public sealed class IntegrationEventMapper: IIntegrationEventMapper
         {
             ProductCreatedEvent e=> new ProductCreatedIntegrationEvent(
                 e.ProductId,
-                "",
-                0,
-                ""
+                e.Name,
+                e.Price,
+                e.Currency
             ),
-            _ =>null
+            
         };
     }
 }

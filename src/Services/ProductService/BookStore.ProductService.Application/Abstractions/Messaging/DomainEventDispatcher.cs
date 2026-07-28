@@ -22,9 +22,18 @@ public sealed class DomainEventDispatcher : IDomainEventDispatcher
         await _publisher.Publish( context.DomainEvent,cancellationToken);
         var integrationEvent = _eventMapper.Map(context.DomainEvent);
 
+        Console.WriteLine(integrationEvent?.GetType().FullName);
+
+        Console.WriteLine(
+            System.Text.Json.JsonSerializer.Serialize(
+                integrationEvent,
+                integrationEvent!.GetType()));
+
         if(integrationEvent is null)
             return;
-
+        Console.WriteLine("===== Before Publish =====");
+        Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(integrationEvent));
+        Console.WriteLine("==========================");
         await _eventBus.PublishAsync(integrationEvent,cancellationToken);
     }
 }

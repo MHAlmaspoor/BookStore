@@ -23,8 +23,9 @@ public sealed class RabbitMqEventBus:IEventBus
             autoDelete: false,
             cancellationToken: cancellationToken );
 
-        var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(integrationEvent));
-
+        var body = JsonSerializer.SerializeToUtf8Bytes(
+            integrationEvent,
+            integrationEvent.GetType());
         var properties = new BasicProperties
         {
             Persistent = true,
@@ -40,6 +41,6 @@ public sealed class RabbitMqEventBus:IEventBus
             basicProperties: properties,
             body: body,
             cancellationToken: cancellationToken);
-        
+
     }
 }

@@ -1,4 +1,8 @@
+using System.Text;
+using System.Text.Json;
+using BookStore.NotificationService.Contracts;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 
 namespace BookStore.NotificationService.Messaging;
 
@@ -33,6 +37,37 @@ public sealed class ProductCreatedConsumer
             exchange: "bookstore.events",
             routingKey: "product.created",
             cancellationToken: cancellationToken);
+
+        var consumer = new AsyncEventingBasicConsumer(channel);
+        consumer.ReceivedAsync += async (_, args) =>
+        {
+            var body = args.Body.ToArray();
+            var message = Encoding.UTF8.GetString(body);
+
+            var integrationEvent = JsonSerializer.Deserialize<ProductCreatedIntegrationEvent>(message);
+
+            if(integrationEvent is null)
+            {
+                return;
+            }
+
+            Console.WriteLine("========== Product Created ==========");
+            Console.WriteLine($"Id         : {integrationEvent.ProductId}");
+            Console.WriteLine($"Name       : {integrationEvent.Name}");
+            Console.WriteLine($"Price      : {integrationEvent.Price}");
+            Console.WriteLine($"Currency   : {integrationEvent.Currency}");
+            Console.WriteLine("=====================================");
+
+            await channel.BasicAckAsync(deliveryTag: args.DeliveryTag, multiple: false, cancellationToken: cancellationToken);
+        };
+
+        await channel.BasicConsumeAsync(
+            queue: "notification.product.created",
+            autoAck: false,
+            consumer: consumer,
+            cancellationToken: cancellationToken);
+
+        await Task.Delay(Timeout.Infinite, cancellationToken);
 
     }
 }
