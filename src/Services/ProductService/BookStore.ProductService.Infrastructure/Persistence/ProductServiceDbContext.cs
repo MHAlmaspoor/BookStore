@@ -1,3 +1,4 @@
+using BookStore.ProductService.Domain.Outbox;
 using BookStore.ProductService.Domain.Products;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,7 @@ public sealed class ProductServiceDbContext : DbContext
     }
 
     public DbSet<Product> Products=>Set<Product>();
+    public DbSet<OutboxMessage> OutboxMessages =>Set<OutboxMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

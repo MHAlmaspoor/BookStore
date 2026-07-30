@@ -1,0 +1,131 @@
+using System.Text.Json;
+using BookStore.ProductService.Application.Abstraction.Messaging;
+using BookStore.ProductService.Domain.Events;
+using BookStore.ProductService.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+
+namespace BookStore.ProductService.Api.BackgroundServices;
+
+public sealed class OutboxProcessor : BackgroundService
+{
+    private readonly IServiceScopeFactory _scopeFactory;
+    private readonly IIntegrationEventMapper _mapper;
+    private readonly IEventBus _eventBus;
+    private readonly ILogger<OutboxProcessor> _logger;
+
+    private static readonly TimeSpan PollingInterval = TimeSpan.FromSeconds(5);
+
+    public OutboxProcessor(
+        IServiceScopeFactory scopeFactory,
+        IIntegrationEventMapper mapper,
+        IEventBus eventBus,
+        ILogger<OutboxProcessor> logger)
+    {
+        _scopeFactory = scopeFactory;
+        _mapper = mapper;
+        _eventBus = eventBus;
+        _logger = logger;
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        _logger.LogInformation("Outbox Processor started.");
+
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
+
+                var dbContext = scope.ServiceProvider
+                    .GetRequiredService<ProductServiceDbContext>();
+
+                var messages = await dbContext.OutboxMessages
+                    .Where(x => x.ProcessedOnUtc == null)
+                    .OrderBy(x => x.OccuredOnUtc)
+                    .Take(20)
+                    .ToListAsync(stoppingToken);
+
+                if (messages.Count == 0)
+                {
+                    await Task.Delay(PollingInterval, stoppingToken);
+                    continue;
+                }
+
+                _logger.LogInformation("Found {Count} pending outbox messages.", messages.Count);
+
+                foreach (var message in messages)
+                {
+                    try
+                    {
+                        var eventType = Type.GetType(message.Type);
+
+                        if (eventType is null)
+                        {
+                            message.MarkAsFailed("Unknown event type.");
+                            continue;
+                        }
+                        var domainEvent = JsonSerializer.Deserialize(
+                            message.Content,
+                            eventType,
+                            new JsonSerializerOptions(JsonSerializerDefaults.Web));
+
+                        if (domainEvent is not IDomainEvent typedDomainEvent)
+                        {
+                            message.MarkAsFailed("Invalid domain event.");
+                            continue;
+                        }
+Console.WriteLine("===== DomainEvent =====");
+Console.WriteLine(typedDomainEvent.GetType().FullName);
+Console.WriteLine(JsonSerializer.Serialize(
+    typedDomainEvent,
+    typedDomainEvent.GetType()));
+Console.WriteLine("=======================");
+                        var integrationEvent =
+                            _mapper.Map(typedDomainEvent);
+
+Console.WriteLine("===== IntegrationEvent =====");
+Console.WriteLine(JsonSerializer.Serialize(
+    integrationEvent,
+    integrationEvent.GetType()));
+Console.WriteLine("============================");
+                        if (integrationEvent is null)
+                        {
+                            message.MarkAsFailed("No integration event mapping found.");
+                            continue;
+                        }
+
+                        await _eventBus.PublishAsync(
+                            integrationEvent,
+                            stoppingToken);
+
+                        message.MarkAsProcessed();
+
+                        _logger.LogInformation(
+                            "Published {EventType}",
+                            integrationEvent.EventType);
+                    }
+                    catch (Exception ex)
+                    {
+                        message.MarkAsFailed(ex.Message);
+
+                        _logger.LogError(
+                            ex,
+                            "Error processing OutboxMessage {MessageId}",
+                            message.Id);
+                    }
+                }
+
+                await dbContext.SaveChangesAsync(stoppingToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Outbox Processor failed.");
+            }
+
+            await Task.Delay(PollingInterval, stoppingToken);
+        }
+    }
+}

@@ -15,6 +15,7 @@
 //     }
 // }
 
+using System.Text.Json.Serialization;
 using BookStore.ProductService.Domain.Events;
 
 namespace BookStore.ProductService.Domain.Products;
@@ -27,12 +28,31 @@ public sealed class ProductCreatedEvent : IDomainEvent
     public decimal Price { get; }
     public string Currency { get; }
 
-    public ProductCreatedEvent(Guid productId, string name, decimal price, string currency)
+    [JsonConstructor]
+    public ProductCreatedEvent(
+        Guid productId,
+
+        string name,
+        decimal price,
+        string currency)
     {
         ProductId = productId;
-        Name=name;
-        Price=price;
-        Currency= currency;
-        OccurredOn = DateTime.UtcNow;
+        Name = name;
+        Price = price;
+        Currency = currency;
+    }
+
+    public ProductCreatedEvent(
+        Guid productId,
+        DateTime occurredOn,
+        string name,
+        decimal price,
+        string currency)
+    {
+        ProductId = productId;
+        OccurredOn = occurredOn;
+        Name = name;
+        Price = price;
+        Currency = currency;
     }
 }

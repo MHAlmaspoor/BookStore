@@ -43,13 +43,13 @@ public sealed class ProductCreatedConsumer
         {
             var body = args.Body.ToArray();
             var message = Encoding.UTF8.GetString(body);
-
             var integrationEvent = JsonSerializer.Deserialize<ProductCreatedIntegrationEvent>(message);
 
             if(integrationEvent is null)
             {
                 return;
             }
+
 
             Console.WriteLine("========== Product Created ==========");
             Console.WriteLine($"Id         : {integrationEvent.ProductId}");
