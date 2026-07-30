@@ -12,7 +12,7 @@ public static class DependencyInjection
 
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
 
-        services.AddScoped<IIntegrationEventMapper, IntegrationEventMapper>();
+        services.AddSingleton<IIntegrationEventMapper, IntegrationEventMapper>();
 
         return services;
     }

@@ -44,13 +44,13 @@ public static class DependenctInjection
 
     return new RabbitMqConnection(connection);
 });
-        services.AddScoped<PublishDomainEventInterceptor>();
+        services.AddScoped<InsertOutboxMessagesInterceptor>();
         services.AddDbContext<ProductServiceDbContext>((sp, option)=>
         {
             option.UseNpgsql(
             configuration.GetConnectionString("ProductDatabase"));
 
-            option.AddInterceptors(sp.GetRequiredService<PublishDomainEventInterceptor>());
+            option.AddInterceptors(sp.GetRequiredService<InsertOutboxMessagesInterceptor>());
 
 
     });
@@ -59,9 +59,9 @@ public static class DependenctInjection
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        services.AddScoped<PublishDomainEventInterceptor>();
+        services.AddScoped<InsertOutboxMessagesInterceptor>();
 
-        services.AddScoped<IIntegrationEventMapper,IntegrationEventMapper>();
+        services.AddSingleton<IIntegrationEventMapper,IntegrationEventMapper>();
         return services;
 
     }

@@ -67,16 +67,18 @@
 // app.Run();
 
 using BookStore.ProductService.Api.Extensions;
+using BookStore.ProductService.Api.BackgroundServices;
 using BookStore.ProductService.Application;
+using BookStore.ProductService.Domain.Outbox;
 using BookStore.ProductService.Infrastructure;
 var builder=WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPresentation();
 builder.Services.AddControllers();
-Console.WriteLine(builder.Configuration.GetConnectionString("ProductDatabase"));
+builder.Services.AddHostedService<OutboxProcessor>();
 var app=builder.Build();
 app.UsePresentation();
 app.MapControllers();
 app.Run();
-Console.WriteLine(builder.Configuration.GetConnectionString("ProductDatabase"));
+

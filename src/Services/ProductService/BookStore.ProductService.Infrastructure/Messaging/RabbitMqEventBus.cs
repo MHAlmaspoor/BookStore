@@ -17,9 +17,9 @@ public sealed class RabbitMqEventBus:IEventBus
     {
         var channel =await _connection.Connection.CreateChannelAsync(cancellationToken: cancellationToken);
         await channel.ExchangeDeclareAsync(
-            exchange: "Bookstore.events",
+            exchange: "bookstore.events",
             type: ExchangeType.Topic,
-            durable: true,
+            durable: false,
             autoDelete: false,
             cancellationToken: cancellationToken );
 
@@ -33,7 +33,6 @@ public sealed class RabbitMqEventBus:IEventBus
         };
 
         const string routingKey = "product.created";
-
         await channel.BasicPublishAsync(
             exchange: "bookstore.events",
             routingKey: routingKey,
@@ -41,6 +40,5 @@ public sealed class RabbitMqEventBus:IEventBus
             basicProperties: properties,
             body: body,
             cancellationToken: cancellationToken);
-
     }
 }
