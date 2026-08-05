@@ -1,41 +1,116 @@
+using BookStore.IdentityService.Application.Command.Register;
+using FluentValidation;
+using BookStore.IdentityService.Application.Behaviors;
+using BookStore.IdentityService.Api.ExceptionHandling;
+using BookStore.IdentityService.Api.Endpoints.Users;
+using BookStore.IdentityService.Infrastructure.DependencyInjection;
+using BookStore.IdentityService.Infrastructure.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.OpenApi;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+//builder.Services.AddOpenApi();
 
+// Swagger
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+       Name = "Authorization",
+       Type = SecuritySchemeType.Http,
+       Scheme = "bearer",
+       BearerFormat = "JWT",
+       In = ParameterLocation.Header,
+       Description = "Enter JWT Token"
+
+    });
+    // options.AddSecurityRequirement(
+    //     new OpenApiSecurityRequirement
+    //     {
+    //         {
+    //             new OpenApiSecurityScheme
+    //             {
+    //                 Reference = new OpenApiReference
+    //                 {
+    //                     Type = ReferenceType.SecurityScheme,
+    //                     Id = "Bearer"
+    //                 }
+    //             },
+    //             Array.Empty<string>()
+    //         }
+    //     });
+});
+
+builder.Services.AddSwaggerGen();
+///
+
+builder.Services.AddValidatorsFromAssembly(typeof(RegisterCommandValidator).Assembly);
+builder.Services.AddMediatR(cfg =>
+{
+   cfg.RegisterServicesFromAssembly(typeof(RegisterCommandHandler).Assembly);
+   cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
+});
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddInfrastructure(builder.Configuration);
+
+var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtOptions.Issuer,
+
+            ValidateAudience = true,
+            ValidAudience = jwtOptions.Audience,
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),
+
+            ValidateLifetime = true,
+
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization();
+builder.Services.AddAuthorization();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseExceptionHandler();
+
+    app.UseSwagger();
+
+    app.UseSwaggerUI();
+    //app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.MapRegisterEndpoint();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
