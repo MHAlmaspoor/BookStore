@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddScoped<ITokenProvider, JwtTokenProvider>();
         services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
         services.AddScoped<IRefreshTokenRepository,RefreshTokenRepository>();
+        services.AddScoped<IRefreshTokenGenerator,RefreshTokenGenerator>();
 
 
 

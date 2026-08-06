@@ -2,13 +2,14 @@ using BookStore.IdentityService.Application.Command.Register;
 using FluentValidation;
 using BookStore.IdentityService.Application.Behaviors;
 using BookStore.IdentityService.Api.ExceptionHandling;
-using BookStore.IdentityService.Api.Endpoints.Users;
+using BookStore.IdentityService.Api.Endpoints.Authentication;
 using BookStore.IdentityService.Infrastructure.DependencyInjection;
 using BookStore.IdentityService.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,7 +52,7 @@ builder.Services.AddSwaggerGen(options =>
     //     });
 });
 
-builder.Services.AddSwaggerGen();
+//builder.Services.AddSwaggerGen();
 ///
 
 builder.Services.AddValidatorsFromAssembly(typeof(RegisterCommandValidator).Assembly);
@@ -89,7 +90,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddAuthorization();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -101,11 +101,20 @@ if (app.Environment.IsDevelopment())
 
     app.UseSwaggerUI();
     //app.MapOpenApi();
+
 }
 
 app.UseHttpsRedirection();
 
 app.MapRegisterEndpoint();
+
+app.MapLoginEndpoint();
+
+app.MapRefreshEndpoint();
+
+app.MapMeEndpoint();
+
+app.MapLogoutEndpoint();
 
 app.UseAuthentication();
 app.UseAuthorization();

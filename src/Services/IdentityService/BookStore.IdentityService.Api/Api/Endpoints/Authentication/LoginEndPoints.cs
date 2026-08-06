@@ -1,9 +1,9 @@
 using BookStore.IdentityService.Application.Command.Login;
 using MediatR;
 
-namespace BookStore.IdentityService.Api.Endpoints.Users;
+namespace BookStore.IdentityService.Api.Endpoints.Authentication;
 
-public static class Login
+public static class LoginEndpoint
 {
     public static IEndpointRouteBuilder MapLoginEndpoint(this IEndpointRouteBuilder app)
     {
