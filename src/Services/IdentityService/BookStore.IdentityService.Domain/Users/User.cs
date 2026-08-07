@@ -6,9 +6,8 @@ using BookStore.IdentityService.Domain.RefreshTokens;
 
 namespace BookStore.IdentityService.Domain.Users;
 
-public sealed class User : AggregatedRoot
+public sealed class User : AggregateRoot<UserId>
 {
-    public UserId Id { get; private set; }
     public Email Email { get; private set; }
     public PasswordHash PasswordHash { get; private set; }
     public string FirstName { get; private set; }
@@ -19,14 +18,14 @@ public sealed class User : AggregatedRoot
 
     public IReadOnlyCollection<RefreshToken> RefreshTokens => _refreshTokens.AsReadOnly();
 
-    public User()
+    private User()
     {
 
     }
 
-public User(UserId id, Email email, PasswordHash passwordHash, string firstName, string lastName)
+public User(UserId id, Email email, PasswordHash passwordHash, string firstName, string lastName) : base(id)
 {
-    Id = id;
+
     Email = email;
     PasswordHash = passwordHash;
 

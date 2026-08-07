@@ -3,4 +3,4 @@ using MediatR;
 
 namespace BookStore.IdentityService.Application.Command.Login;
 
-public sealed record LoginCommand(string Email, string Password) : IRequest<LoginResponse>;
+public sealed record LoginCommand(string Email, string Password, string? Device, string IpAddress) : IRequest<LoginResponse>;

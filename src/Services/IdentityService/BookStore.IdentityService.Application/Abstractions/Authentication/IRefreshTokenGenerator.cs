@@ -5,5 +5,5 @@ namespace BookStore.IdentityService.Application.Abstraction.Authentication;
 
 public interface IRefreshTokenGenerator
 {
-    RefreshToken Generate(UserId userId);
+    RefreshToken Generate( UserId userId, string? device, string? ipAddress);
 }

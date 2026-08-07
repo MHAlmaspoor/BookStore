@@ -47,9 +47,9 @@ using MediatR;
 
             var accessToken = _tokenProvider.CreateAccessToken(user);
 
-            var newRefreshToken = _refreshTokenGenerator.Generate(user.Id);
+            var newRefreshToken = _refreshTokenGenerator.Generate(user.Id, request.Device, request.IpAddress);
 
-            refreshToken.Revoke(newRefreshToken.Token);
+            refreshToken.Revoke(newRefreshToken.ReplacedByRefreshTokenId);
 
             user.AddRefreshToken(newRefreshToken.Token,newRefreshToken.ExpiresOnUtc,null,null);
 

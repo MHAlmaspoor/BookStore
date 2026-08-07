@@ -1,12 +1,19 @@
+using System.Diagnostics;
+
 namespace BookStore.IdentityService.Domain.Common;
-public abstract class Entity:IEquatable<Entity>
+public abstract class Entity<TId>:IEquatable<Entity<TId>> where TId : notnull
 {
-    public Guid Id{get; protected set;}
+    public TId Id { get; private set; } = default!;
+
     protected Entity()
     {
-        Id=Guid.CreateVersion7();
+
     }
-    public bool Equals(Entity? other)
+    public Entity(TId id)
+    {
+        Id =id;
+    }
+    public bool Equals(Entity<TId>? other)
     {
         if(other is null)
             return false;
@@ -14,26 +21,19 @@ public abstract class Entity:IEquatable<Entity>
             return true;
         if(GetType()!=other.GetType())
             return false;
-        return Id==other.Id;
+        return EqualityComparer<TId>.Default.Equals(Id, other.Id);
     }
-    public override bool Equals(object? obj)
-    {
-        //1
-        //return Equals(obj as Entity)    1===2
+    public override bool Equals(object? obj) =>obj is Entity<TId> other && Equals(other);
+    // {
+    //     //1
+    //     //return Equals(obj as Entity)    1===2
 
-        //2
-        return obj is Entity other && Equals(other);
-    }
-    public override int GetHashCode()
-    {
-        return Id.GetHashCode();
-    }
-    public static bool operator ==(Entity? left,Entity? right)
-    {
-        return Equals(left,right);
-    }
-    public static bool operator !=(Entity? left, Entity? right)
-    {
-        return !Equals(left,right);
-    }
+    //     //2
+    //     return obj is Entity other && Equals(other);
+    // }
+    public override int GetHashCode() => EqualityComparer<TId>.Default.GetHashCode(Id);
+
+    public static bool operator ==(Entity<TId> left, Entity<TId> right) => Equals(left,right);
+
+    public static bool operator !=(Entity<TId> left, Entity<TId> right) => !Equals(left, right);
 }

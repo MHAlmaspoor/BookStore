@@ -3,4 +3,4 @@ using MediatR;
 
 namespace BookStore.IdentityService.Application.Command.Refresh;
 
-public sealed record RefreshCommand( string RefreshToken) : IRequest<LoginResponse>;
+public sealed record RefreshCommand(string RefreshToken, string? Device, string? IpAddress) : IRequest<LoginResponse>;

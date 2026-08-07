@@ -4,25 +4,24 @@ using BookStore.IdentityService.Domain.ValueObjects;
 
 namespace BookStore.IdentityService.Domain.RefreshTokens;
 
-public sealed class RefreshToken : Entity
+public sealed class RefreshToken : Entity<RefreshTokenId>
 {
     public UserId UserId { get; private set; }
-    public User User { get; private set; } = null;
-    public string Token { get; private set; } = null;
+    public User User { get; private set; } = null!;
+    public string Token { get; private set; } = null!;
     public DateTime ExpiresOnUtc { get; private set; }
     public DateTime CreatedOnUtc { get; private set; }
     public DateTime? RevokedOnUtc { get; private set; }
-    public string? ReplacedByToken { get; private set; }
+    public RefreshTokenId? ReplacedByRefreshTokenId { get; private set; }
     public string? Device { get; private set; }
     public string? IpAddress { get; private set; }
 
     private RefreshToken()
     {
-
     }
 
-    private RefreshToken(UserId userId, string token, DateTime expiresOnUtc, DateTime createdOnUtc,
-        string? device, string? ipAddress)
+    private RefreshToken(RefreshTokenId id, UserId userId, string token, DateTime expiresOnUtc, DateTime createdOnUtc, string? device, string? ipAddress)
+        : base(id)
     {
         UserId = userId;
         Token = token;
@@ -34,32 +33,23 @@ public sealed class RefreshToken : Entity
         IpAddress = ipAddress;
     }
 
-    public bool IsExpired
-        => DateTime.UtcNow >= ExpiresOnUtc;
-
-    public bool IsRevoked
-        => RevokedOnUtc.HasValue;
-
-    public bool IsActive
-        => !IsExpired && !IsRevoked;
-
-    public void Revoke(string? replacedByToken = null)
+    public static RefreshToken Create(UserId userId, string token, DateTime expiresOnUtc, string? device, string? ipAddress)
     {
-        if(IsRevoked)
+        return new RefreshToken(RefreshTokenId.New(), userId, token, expiresOnUtc, DateTime.UtcNow, device, ipAddress);
+    }
+
+    public bool IsExpired => DateTime.UtcNow >= ExpiresOnUtc;
+
+    public bool IsRevoked => RevokedOnUtc.HasValue;
+
+    public bool IsActive => !IsExpired && !IsRevoked;
+
+    public void Revoke(RefreshTokenId? replacedByTokenId = null)
+    {
+        if (IsRevoked)
             return;
+
         RevokedOnUtc = DateTime.UtcNow;
-        ReplacedByToken = replacedByToken;
-    }
-
-    public static RefreshToken Create(UserId userId, string token, DateTime expiresOnUtc, string? device = null,
-        string? ipAddress = null)
-    {
-    return new RefreshToken(userId, token, expiresOnUtc,
-        DateTime.UtcNow, device, ipAddress);
-    }
-
-    public bool CanBeUsed()
-    {
-        return !IsExpired && !IsRevoked;
+        ReplacedByRefreshTokenId = replacedByTokenId;
     }
 }
