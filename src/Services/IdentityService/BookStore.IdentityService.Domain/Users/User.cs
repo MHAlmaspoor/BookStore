@@ -3,6 +3,8 @@ using BookStore.IdentityService.Domain.Exceptions;
 using BookStore.IdentityService.Domain.Users.Events;
 using BookStore.IdentityService.Domain.ValueObjects;
 using BookStore.IdentityService.Domain.RefreshTokens;
+using BookStore.IdentityService.Domain.Roles;
+using BookStore.IdentityService.Domain.UserRoles;
 
 namespace BookStore.IdentityService.Domain.Users;
 
@@ -12,6 +14,9 @@ public sealed class User : AggregateRoot<UserId>
     public PasswordHash PasswordHash { get; private set; }
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
+    private readonly List<UserRole> _roles = [];
+
+    public IReadOnlyCollection<UserRole> Roles =>_roles.AsReadOnly();
     public bool IsActive { get; private set; }
 
     private readonly List<RefreshToken> _refreshTokens=[];
@@ -99,6 +104,24 @@ public User(UserId id, Email email, PasswordHash passwordHash, string firstName,
     public static User Register(string firstName, string lastName, Email email, PasswordHash passwordHash)
     {
         return new User(UserId.New(), email, passwordHash, firstName, lastName);
+    }
+
+    public void AddRle(RoleId roleId)
+    {
+        if(_roles.Any(x=>x.RoleId == roleId))
+            return;
+
+        _roles.Add(UserRole.Create(Id,roleId));
+    }
+
+    public void RemoveRole(RoleId roleId)
+    {
+        var role= _roles.FirstOrDefault(x=>x.RoleId ==roleId);
+
+        if(role is null)
+            return;
+
+        _roles.Remove(role);
     }
 
 }

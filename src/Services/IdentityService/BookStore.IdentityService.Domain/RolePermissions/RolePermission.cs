@@ -6,7 +6,9 @@ namespace BookStore.IdentityService.Domain.RolePermissions;
 public sealed class RolePermission
 {
     public RoleId RoleId { get; private set; } = null!;
+    public Role Role { get; set; } = null!;
     public PermissionId PermissionId { get; private set; } = null!;
+    public Permission Permission { get; set; } = null!;
 
     private RolePermission()
     {

@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using BookStore.IdentityService.Infrastructure.Authentication;
 using BookStore.IdentityService.Application.Abstraction.Authentication;
+using BookStore.IdentityService.Application.Abstraction.Repositories;
+using BookStore.IdentityService.Domain.Roles;
 
 
 namespace BookStore.IdentityService.Infrastructure.DependencyInjection;
@@ -33,8 +35,8 @@ public static class DependencyInjection
         services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
         services.AddScoped<IRefreshTokenRepository,RefreshTokenRepository>();
         services.AddScoped<IRefreshTokenGenerator,RefreshTokenGenerator>();
-
-
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IPersmissionRepository, PermissionRepository>();
 
         return services;
     }
