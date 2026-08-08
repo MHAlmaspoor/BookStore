@@ -22,7 +22,7 @@ internal sealed class RolePermissionConfiguration : IEntityTypeConfiguration<Rol
         builder.Property(x=> x.RoleId).HasConversion(id=>id.Value, value => new RoleId(value));
         builder.Property(x=>x.PermissionId).HasConversion(x=>x.Value, value => new PermissionId(value));
 
-        builder.HasOne(x=>x.Role).WithMany(x=>x.Permissions).HasForeignKey(x=>x.RoleId);
-        builder.HasOne(x=>x.Permission).WithMany(x=>x.Roles).HasForeignKey(x=>x.PermissionId);
+        builder.HasOne(x=>x.Role).WithMany(x=>x.Permissions).HasForeignKey(x=>x.RoleId).OnDelete(DeleteBehavior.Cascade);
+        builder.HasOne(x=>x.Permission).WithMany(x=>x.Roles).HasForeignKey(x=>x.PermissionId).OnDelete(DeleteBehavior.Cascade);
     }
 }
