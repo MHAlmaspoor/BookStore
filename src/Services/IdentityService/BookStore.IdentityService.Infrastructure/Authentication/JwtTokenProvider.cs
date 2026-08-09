@@ -18,12 +18,12 @@ public sealed class JwtTokenProvider : ITokenProvider
         _jwOption=jwOption.Value;
     }
 
-    public LoginResponse CreateAccessToken(User user)
+    public LoginResponse CreateAccessToken(User user, IReadOnlyCollection<string> permissions)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwOption.SecretKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.Value.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email.Value),
@@ -31,6 +31,9 @@ public sealed class JwtTokenProvider : ITokenProvider
             new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
+
+        foreach(var permission in permissions)
+            claims.Add(new Claim("permission", permission));
 
         var token = new JwtSecurityToken(
             issuer: _jwOption.Issuer,

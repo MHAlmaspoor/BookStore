@@ -1,0 +1,521 @@
+warning: in the working copy of 'BookStore.slnx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'api-tests/Book Shop Microservices/Identity Services/Login.yml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Services/IdentityService/BookStore.IdentityService.Api/Program.cs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Services/IdentityService/BookStore.IdentityService.Application/Abstractions/Authentication/ITokenProvider.cs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Services/IdentityService/BookStore.IdentityService.Application/Commands/Login/LoginCommandHandler.cs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Services/IdentityService/BookStore.IdentityService.Application/Commands/Refresh/RefreshCommandHandler.cs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Services/IdentityService/BookStore.IdentityService.Infrastructure/Authentication/JwtTokenProvider.cs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Services/IdentityService/BookStore.IdentityService.Infrastructure/DependencyInjection/DependencyInjection.cs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Services/ProductService/BookStore.ProductService.Api/Controllers/ProductsController.cs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Services/ProductService/BookStore.ProductService.Api/Program.cs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/Services/ProductService/BookStore.ProductService.Api/appsettings.json', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/BookStore.slnx b/BookStore.slnx[m
+[1mindex fae6d75..c56bb4e 100644[m
+[1m--- a/BookStore.slnx[m
+[1m+++ b/BookStore.slnx[m
+[36m@@ -27,4 +27,7 @@[m
+   <Folder Name="/tests/BookStore.IdentityService.Domain.Tests/">[m
+     <Project Path="tests/BookStore.IdentityService.Domain.Tests/bookStore.IdentityService.Domain.Tests.csproj" />[m
+   </Folder>[m
+[32m+[m[32m  <Folder Name="/src/BuildingBlocks/BookStore.BuildingBlocks/">[m
+[32m+[m[32m    <Project Path="src/BuildingBlocks/BookStore.BuildingBlocks/BookStore.BuildingBlocks.csproj" />[m
+[32m+[m[32m  </Folder>[m
+ </Solution>[m
+[1mdiff --git a/api-tests/Book Shop Microservices/Identity Services/Login.yml b/api-tests/Book Shop Microservices/Identity Services/Login.yml[m
+[1mindex f6b53ab..9467f4e 100644[m
+[1m--- a/api-tests/Book Shop Microservices/Identity Services/Login.yml[m	
+[1m+++ b/api-tests/Book Shop Microservices/Identity Services/Login.yml[m	
+[36m@@ -12,3 +12,4 @@[m [msettings:[m
+   timeout: 0[m
+   followRedirects: true[m
+   maxRedirects: 5[m
+[32m+[m[32m​[m
+[1mdiff --git a/src/Services/IdentityService/BookStore.IdentityService.Api/Program.cs b/src/Services/IdentityService/BookStore.IdentityService.Api/Program.cs[m
+[1mindex 257cda2..6051f34 100644[m
+[1m--- a/src/Services/IdentityService/BookStore.IdentityService.Api/Program.cs[m
+[1m+++ b/src/Services/IdentityService/BookStore.IdentityService.Api/Program.cs[m
+[36m@@ -11,6 +11,8 @@[m [musing System.Text;[m
+ using Microsoft.OpenApi;[m
+ using BookStore.IdentityService.Infrastructure.Persistence;[m
+ using Microsoft.AspNetCore.Identity;[m
+[32m+[m[32musing Microsoft.AspNetCore.Authorization;[m
+[32m+[m[32musing BookStore.IdentityService.Infrastructure.Authorization;[m
+ [m
+ [m
+ [m
+[36m@@ -68,6 +70,7 @@[m [mbuilder.Services.AddProblemDetails();[m
+ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();[m
+ builder.Services.AddInfrastructure(builder.Configuration);[m
+ [m
+[32m+[m
+ var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;[m
+ [m
+ [m
+[36m@@ -92,7 +95,11 @@[m [mbuilder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)[m
+         };[m
+     });[m
+ [m
+[32m+[m
+[32m+[m[32mbuilder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();[m
+[32m+[m[32mbuilder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();[m
+ builder.Services.AddAuthorization();[m
+[32m+[m
+ var app = builder.Build();[m
+ [m
+ await app.Services.SeedInfrastructureAsync();[m
+[1mdiff --git a/src/Services/IdentityService/BookStore.IdentityService.Application/Abstractions/Authentication/ITokenProvider.cs b/src/Services/IdentityService/BookStore.IdentityService.Application/Abstractions/Authentication/ITokenProvider.cs[m
+[1mindex a54bb6e..8486926 100644[m
+[1m--- a/src/Services/IdentityService/BookStore.IdentityService.Application/Abstractions/Authentication/ITokenProvider.cs[m
+[1m+++ b/src/Services/IdentityService/BookStore.IdentityService.Application/Abstractions/Authentication/ITokenProvider.cs[m
+[36m@@ -5,5 +5,5 @@[m [mnamespace BookStore.IdentityService.Application.Abstraction.Authentication;[m
+ [m
+ public interface ITokenProvider[m
+ {[m
+[31m-    LoginResponse CreateAccessToken(User user);[m
+[32m+[m[32m    LoginResponse CreateAccessToken(User user, IReadOnlyCollection<string> permissions);[m
+ }[m
+[1mdiff --git a/src/Services/IdentityService/BookStore.IdentityService.Application/BookStore.IdentityService.Application.csproj b/src/Services/IdentityService/BookStore.IdentityService.Application/BookStore.IdentityService.Application.csproj[m
+[1mindex f119cac..a496f98 100644[m
+[1m--- a/src/Services/IdentityService/BookStore.IdentityService.Application/BookStore.IdentityService.Application.csproj[m
+[1m+++ b/src/Services/IdentityService/BookStore.IdentityService.Application/BookStore.IdentityService.Application.csproj[m
+[36m@@ -7,6 +7,7 @@[m
+ [m
+   <ItemGroup>[m
+     <PackageReference Include="FluentValidation" Version="12.1.1" />[m
+[32m+[m[32m    <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="10.0.10" />[m
+   </ItemGroup>[m
+ [m
+   <PropertyGroup>[m
+[1mdiff --git a/src/Services/IdentityService/BookStore.IdentityService.Application/Commands/Login/LoginCommandHandler.cs b/src/Services/IdentityService/BookStore.IdentityService.Application/Commands/Login/LoginCommandHandler.cs[m
+[1mindex d9f4804..eb68ea3 100644[m
+[1m--- a/src/Services/IdentityService/BookStore.IdentityService.Application/Commands/Login/LoginCommandHandler.cs[m
+[1m+++ b/src/Services/IdentityService/BookStore.IdentityService.Application/Commands/Login/LoginCommandHandler.cs[m
+[36m@@ -1,5 +1,6 @@[m
+ using BookStore.IdentityService.Application.Abstraction.Authentication;[m
+ using BookStore.IdentityService.Application.Abstraction.Persistance;[m
+[32m+[m[32musing BookStore.IdentityService.Application.Abstractions.Authorization;[m
+ using BookStore.IdentityService.Application.Abstractions.Persistence;[m
+ using BookStore.IdentityService.Application.Abstractions.Security;[m
+ using BookStore.IdentityService.Application.Contracts.Authentication;[m
+[36m@@ -17,15 +18,17 @@[m [mpublic sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes[m
+     private readonly IRefreshTokenGenerator _refreshTokenGenerator;[m
+     private readonly IRefreshTokenRepository _refreshTokenRepository;[m
+     private readonly IUnitOfWork _unitOfWork;[m
+[32m+[m[32m    private readonly IUserPermissionRepository _userPermissionRepository;[m
+ [m
+     public LoginCommandHandler(IUserRepository userRepository, IPasswordHasher passwordHasher, ITokenProvider tokenProvider,[m
+[31m-        IRefreshTokenGenerator refreshTokenGenerator, IRefreshTokenRepository refreshTokenRepository, IUnitOfWork unitOfWork)[m
+[32m+[m[32m        IRefreshTokenGenerator refreshTokenGenerator, IRefreshTokenRepository refreshTokenRepository, IUserPermissionRepository userPermissionRepository, IUnitOfWork unitOfWork)[m
+     {[m
+         _userRepository=userRepository;[m
+         _passwordHasher=passwordHasher;[m
+         _tokenProvider=tokenProvider;[m
+         _refreshTokenGenerator=refreshTokenGenerator;[m
+         _refreshTokenRepository=refreshTokenRepository;[m
+[32m+[m[32m        _userPermissionRepository = userPermissionRepository;[m
+         _unitOfWork=unitOfWork;[m
+     }[m
+ [m
+[36m@@ -33,13 +36,15 @@[m [mpublic sealed class LoginCommandHandler : IRequestHandler<LoginCommand, LoginRes[m
+     {[m
+         var email = Email.Create(request.Email);[m
+         var user = await _userRepository.GetByEmailAsync(email,cancellationToken);[m
+[32m+[m[32m        var permissions = await _userPermissionRepository.GetPermissionsAsync(user.Id, cancellationToken);[m
+[32m+[m[41m        [m
+ [m
+         if(user is null || !_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))[m
+             throw new DomainException("Invalid email or password.");[m
+ [m
+[31m-        var jwt = _tokenProvider.CreateAccessToken(user);[m
+[32m+[m[32m        var jwt = _tokenProvider.CreateAccessToken(user, permissions);[m
+ [m
+[31m-    var refreshToken = _refreshTokenGenerator.Generate(user.Id, request.Device, request.IpAddress);[m
+[32m+[m[32m        var refreshToken = _refreshTokenGenerator.Generate(user.Id, request.Device, request.IpAddress);[m
+ [m
+         await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);[m
+ [m
+[1mdiff --git a/src/Services/IdentityService/BookStore.IdentityService.Application/Commands/Refresh/RefreshCommandHandler.cs b/src/Services/IdentityService/BookStore.IdentityService.Application/Commands/Refresh/RefreshCommandHandler.cs[m
+[1mindex 198973d..38c5949 100644[m
+[1m--- a/src/Services/IdentityService/BookStore.IdentityService.Application/Commands/Refresh/RefreshCommandHandler.cs[m
+[1m+++ b/src/Services/IdentityService/BookStore.IdentityService.Application/Commands/Refresh/RefreshCommandHandler.cs[m
+[36m@@ -1,5 +1,6 @@[m
+  using BookStore.IdentityService.Application.Abstraction.Authentication;[m
+ using BookStore.IdentityService.Application.Abstraction.Persistance;[m
+[32m+[m[32musing BookStore.IdentityService.Application.Abstractions.Authorization;[m
+ using BookStore.IdentityService.Application.Abstractions.Persistence;[m
+ using BookStore.IdentityService.Application.Command.Refresh;[m
+ using BookStore.IdentityService.Application.Contracts.Authentication;[m
+[36m@@ -11,6 +12,7 @@[m [musing MediatR;[m
+         private readonly IUserRepository _userRepository;[m
+         private readonly ITokenProvider _tokenProvider;[m
+         private readonly IRefreshTokenGenerator _refreshTokenGenerator;[m
+[32m+[m[32m        private readonly IUserPermissionRepository _userPermissionRepository;[m
+         private readonly IUnitOfWork _unitOfWork;[m
+ [m
+         public RefreshCommandHandler([m
+[36m@@ -18,18 +20,22 @@[m [musing MediatR;[m
+             IUserRepository userRepository,[m
+             ITokenProvider tokenProvider,[m
+             IRefreshTokenGenerator refreshTokenGenerator,[m
+[32m+[m[32m            IUserPermissionRepository userPermissionRepository,[m
+             IUnitOfWork unitOfWork)[m
+         {[m
+             _refreshTokenRepository = refreshTokenRepository;[m
+             _userRepository = userRepository;[m
+             _tokenProvider = tokenProvider;[m
+             _refreshTokenGenerator = refreshTokenGenerator;[m
+[32m+[m[32m            _userPermissionRepository = userPermissionRepository;[m
+             _unitOfWork = unitOfWork;[m
+         }[m
+ [m
+         public async Task<LoginResponse> Handle(RefreshCommand request, CancellationToken cancellationToken)[m
+         {[m
+             var refreshToken = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken,cancellationToken);[m
+[32m+[m[32m            var user = await _refreshTokenRepository.GetByIdAsync(refreshToken.UserId, cancellationToken);[m
+[32m+[m[32m            var permissions = await _userPermissionRepository.GetPermissionsAsync(user.Id, cancellationToken);[m
+ [m
+             if(refreshToken is null)[m
+                 throw new DomainException("Invalid refresh token");[m
+[36m@@ -40,12 +46,12 @@[m [musing MediatR;[m
+             if(refreshToken.IsExpired)[m
+                 throw new DomainException("Refresh token is expired.");[m
+ [m
+[31m-            var user = await _refreshTokenRepository.GetByIdAsync(refreshToken.UserId, cancellationToken);[m
+[32m+[m
+ [m
+             if(user is null)[m
+                 throw new DomainException("User not found");[m
+ [m
+[31m-            var accessToken = _tokenProvider.CreateAccessToken(user);[m
+[32m+[m[32m            var accessToken = _tokenProvider.CreateAccessToken(user,permissions);[m
+ [m
+             var newRefreshToken = _refreshTokenGenerator.Generate(user.Id, request.Device, request.IpAddress);[m
+ [m
+[1mdiff --git a/src/Services/IdentityService/BookStore.IdentityService.Infrastructure/Authentication/JwtTokenProvider.cs b/src/Services/IdentityService/BookStore.IdentityService.Infrastructure/Authentication/JwtTokenProvider.cs[m
+[1mindex 951511b..83b6fe5 100644[m
+[1m--- a/src/Services/IdentityService/BookStore.IdentityService.Infrastructure/Authentication/JwtTokenProvider.cs[m
+[1m+++ b/src/Services/IdentityService/BookStore.IdentityService.Infrastructure/Authentication/JwtTokenProvider.cs[m
+[36m@@ -18,12 +18,12 @@[m [mpublic sealed class JwtTokenProvider : ITokenProvider[m
+         _jwOption=jwOption.Value;[m
+     }[m
+ [m
+[31m-    public LoginResponse CreateAccessToken(User user)[m
+[32m+[m[32m    public LoginResponse CreateAccessToken(User user, IReadOnlyCollection<string> permissions)[m
+     {[m
+         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwOption.SecretKey));[m
+         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);[m
+ [m
+[31m-        var claims = new[][m
+[32m+[m[32m        var claims = new List<Claim>[m
+         {[m
+             new Claim(JwtRegisteredClaimNames.Sub, user.Id.Value.ToString()),[m
+             new Claim(JwtRegisteredClaimNames.Email, user.Email.Value),[m
+[36m@@ -32,6 +32,9 @@[m [mpublic sealed class JwtTokenProvider : ITokenProvider[m
+             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())[m
+         };[m
+ [m
+[32m+[m[32m        foreach(var permission in permissions)[m
+[32m+[m[32m            claims.Add(new Claim("permission", permission));[m
+[32m+[m
+         var token = new JwtSecurityToken([m
+             issuer: _jwOption.Issuer,[m
+             audience: _jwOption.Audience,[m
+[1mdiff --git a/src/Services/IdentityService/BookStore.IdentityService.Infrastructure/DependencyInjection/DependencyInjection.cs b/src/Services/IdentityService/BookStore.IdentityService.Infrastructure/DependencyInjection/DependencyInjection.cs[m
+[1mindex 63954bd..9771ffc 100644[m
+[1m--- a/src/Services/IdentityService/BookStore.IdentityService.Infrastructure/DependencyInjection/DependencyInjection.cs[m
+[1m+++ b/src/Services/IdentityService/BookStore.IdentityService.Infrastructure/DependencyInjection/DependencyInjection.cs[m
+[36m@@ -12,6 +12,7 @@[m [musing BookStore.IdentityService.Infrastructure.Authentication;[m
+ using BookStore.IdentityService.Application.Abstraction.Authentication;[m
+ using BookStore.IdentityService.Application.Abstraction.Repositories;[m
+ using BookStore.IdentityService.Domain.Roles;[m
+[32m+[m[32musing BookStore.IdentityService.Application.Abstractions.Authorization;[m
+ [m
+ [m
+ namespace BookStore.IdentityService.Infrastructure.DependencyInjection;[m
+[36m@@ -37,6 +38,7 @@[m [mpublic static class DependencyInjection[m
+         services.AddScoped<IRefreshTokenGenerator,RefreshTokenGenerator>();[m
+         services.AddScoped<IRoleRepository, RoleRepository>();[m
+         services.AddScoped<IPersmissionRepository, PermissionRepository>();[m
+[32m+[m[32m        services.AddScoped<IUserPermissionRepository, UserPermissionRepository>();[m
+ [m
+         return services;[m
+     }[m
+[1mdiff --git a/src/Services/ProductService/BookStore.ProductService.Api/BookStore.ProductService.Api.csproj b/src/Services/ProductService/BookStore.ProductService.Api/BookStore.ProductService.Api.csproj[m
+[1mindex ce1981b..388bd81 100644[m
+[1m--- a/src/Services/ProductService/BookStore.ProductService.Api/BookStore.ProductService.Api.csproj[m
+[1m+++ b/src/Services/ProductService/BookStore.ProductService.Api/BookStore.ProductService.Api.csproj[m
+[36m@@ -7,6 +7,7 @@[m
+   </PropertyGroup>[m
+ [m
+   <ItemGroup>[m
+[32m+[m[32m    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />[m
+     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />[m
+     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">[m
+       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>[m
+[36m@@ -18,6 +19,7 @@[m
+   <ItemGroup>[m
+     <ProjectReference Include="..\BookStore.ProductService.Application\BookStore.ProductService.Application.csproj" />[m
+     <ProjectReference Include="..\BookStore.ProductService.Infrastructure\BookStore.ProductService.Infrastructure.csproj" />[m
+[32m+[m[32m    <ProjectReference Include="..\..\..\BuildingBlocks\BookStore.BuildingBlocks\BookStore.BuildingBlocks.csproj" />[m
+   </ItemGroup>[m
+ [m
+ </Project>[m
+[1mdiff --git a/src/Services/ProductService/BookStore.ProductService.Api/Controllers/ProductsController.cs b/src/Services/ProductService/BookStore.ProductService.Api/Controllers/ProductsController.cs[m
+[1mindex e74b688..f152ce5 100644[m
+[1m--- a/src/Services/ProductService/BookStore.ProductService.Api/Controllers/ProductsController.cs[m
+[1m+++ b/src/Services/ProductService/BookStore.ProductService.Api/Controllers/ProductsController.cs[m
+[36m@@ -1,11 +1,13 @@[m
+ using BookStore.ProductService.Application.Products.Command.CreateProduct;[m
+ using MediatR;[m
+[32m+[m[32musing Microsoft.AspNetCore.Authorization;[m
+ using Microsoft.AspNetCore.Mvc;[m
+ [m
+ namespace BookStore.ProductService.Api.Controllers;[m
+ [m
+ [ApiController][m
+ [Route("api/products")][m
+[32m+[m
+ public class ProductsController:ControllerBase[m
+ {[m
+     private readonly ISender _sender;[m
+[36m@@ -15,6 +17,7 @@[m [mpublic class ProductsController:ControllerBase[m
+     }[m
+ [m
+     [HttpPost][m
+[32m+[m[32m     [Authorize(Policy = "permission:product:create")][m
+     public async Task<ActionResult<Guid>> Create(CreateProductCommand command, CancellationToken cancellationToken)[m
+     {[m
+         var id=await _sender.Send(command,cancellationToken);[m
+[1mdiff --git a/src/Services/ProductService/BookStore.ProductService.Api/Program.cs b/src/Services/ProductService/BookStore.ProductService.Api/Program.cs[m
+[1mindex 2b49d0d..a1a0bab 100644[m
+[1m--- a/src/Services/ProductService/BookStore.ProductService.Api/Program.cs[m
+[1m+++ b/src/Services/ProductService/BookStore.ProductService.Api/Program.cs[m
+[36m@@ -71,14 +71,208 @@[m [musing BookStore.ProductService.Api.BackgroundServices;[m
+ using BookStore.ProductService.Application;[m
+ using BookStore.ProductService.Domain.Outbox;[m
+ using BookStore.ProductService.Infrastructure;[m
+[31m-var builder=WebApplication.CreateBuilder(args);[m
+[32m+[m[32musing BookStore.BuildingBlocks.Authorization;[m
+[32m+[m[32musing Microsoft.AspNetCore.Authorization;[m
+[32m+[m[32musing Microsoft.AspNetCore.Authentication.JwtBearer;[m
+[32m+[m[32musing BookStore.ProductService.Infrastructure.Authentication;[m
+[32m+[m[32musing Microsoft.IdentityModel.Tokens;[m
+[32m+[m[32musing System.Text;[m
+[32m+[m[32musing Microsoft.OpenApi;[m
+[32m+[m
+[32m+[m
+[32m+[m[32m// var builder=WebApplication.CreateBuilder(args);[m
+[32m+[m[32m// builder.Services.AddApplication();[m
+[32m+[m[32m// builder.Services.AddInfrastructure(builder.Configuration);[m
+[32m+[m[32m// builder.Services.AddPresentation();[m
+[32m+[m[32m// builder.Services.AddControllers();[m
+[32m+[m[32m// builder.Services.AddHostedService<OutboxProcessor>();[m
+[32m+[m
+[32m+[m[32m// builder.Services.AddSingleton<[m
+[32m+[m[32m//     IAuthorizationPolicyProvider,[m
+[32m+[m[32m//     PermissionPolicyProvider>();[m
+[32m+[m
+[32m+[m[32m// builder.Services.AddSingleton<[m
+[32m+[m[32m//     IAuthorizationHandler,[m
+[32m+[m[32m//     PermissionAuthorizationHandler>();[m
+[32m+[m
+[32m+[m[32m// var jwtOptions = builder.Configuration[m
+[32m+[m[32m//     .GetSection(JwtOptions.SectionName)[m
+[32m+[m[32m//     .Get<JwtOptions>()[m
+[32m+[m[32m//     ?? throw new InvalidOperationException([m
+[32m+[m[32m//         "JWT configuration is missing.");[m
+[32m+[m
+[32m+[m[32m// builder.Services[m
+[32m+[m[32m//     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)[m
+[32m+[m[32m//     .AddJwtBearer(options =>[m
+[32m+[m[32m//     {[m
+[32m+[m[32m//         options.TokenValidationParameters = new TokenValidationParameters[m
+[32m+[m[32m//         {[m
+[32m+[m[32m//             ValidateIssuer = true,[m
+[32m+[m[32m//             ValidIssuer = jwtOptions.Issuer,[m
+[32m+[m
+[32m+[m[32m//             ValidateAudience = true,[m
+[32m+[m[32m//             ValidAudience = jwtOptions.Audience,[m
+[32m+[m
+[32m+[m[32m//             ValidateIssuerSigningKey = true,[m
+[32m+[m[32m//             IssuerSigningKey = new SymmetricSecurityKey([m
+[32m+[m[32m//                 Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),[m
+[32m+[m
+[32m+[m[32m//             ValidateLifetime = true,[m
+[32m+[m[32m//             ClockSkew = TimeSpan.Zero[m
+[32m+[m[32m//         };[m
+[32m+[m
+[32m+[m[32m//         options.Events = new JwtBearerEvents[m
+[32m+[m[32m//         {[m
+[32m+[m[32m//             OnMessageReceived = context =>[m
+[32m+[m[32m//             {[m
+[32m+[m[32m//                 Console.WriteLine([m
+[32m+[m[32m//                     ">>> JwtBearer: OnMessageReceived");[m
+[32m+[m
+[32m+[m[32m//                 Console.WriteLine([m
+[32m+[m[32m//                     $"Token exists: {!string.IsNullOrWhiteSpace(context.Token)}");[m
+[32m+[m
+[32m+[m[32m//                 return Task.CompletedTask;[m
+[32m+[m[32m//             },[m
+[32m+[m
+[32m+[m[32m//             OnAuthenticationFailed = context =>[m
+[32m+[m[32m//             {[m
+[32m+[m[32m//                 Console.WriteLine([m
+[32m+[m[32m//                     $">>> JwtBearer FAILED: {context.Exception}");[m
+[32m+[m
+[32m+[m[32m//                 return Task.CompletedTask;[m
+[32m+[m[32m//             },[m
+[32m+[m
+[32m+[m[32m//             OnTokenValidated = context =>[m
+[32m+[m[32m//             {[m
+[32m+[m[32m//                 Console.WriteLine([m
+[32m+[m[32m//                     ">>> JwtBearer VALIDATED");[m
+[32m+[m
+[32m+[m[32m//                 return Task.CompletedTask;[m
+[32m+[m[32m//             }[m
+[32m+[m[32m//         };[m
+[32m+[m[32m//     });[m
+[32m+[m
+[32m+[m
+[32m+[m[32m// builder.Services.AddSwaggerGen(options =>[m
+[32m+[m[32m// {[m
+[32m+[m[32m//     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme[m
+[32m+[m[32m//     {[m
+[32m+[m[32m//         Description = "JWT Authorization header using the Bearer scheme.",[m
+[32m+[m[32m//         Name = "Authorization",[m
+[32m+[m[32m//         In = ParameterLocation.Header,[m
+[32m+[m[32m//         Type = SecuritySchemeType.Http,[m
+[32m+[m[32m//         Scheme = "Bearer"[m
+[32m+[m[32m//     });[m
+[32m+[m[32m// });[m
+[32m+[m
+[32m+[m
+[32m+[m[32m// builder.Services.AddAuthorization();[m
+[32m+[m[32m// var app=builder.Build();[m
+[32m+[m[32m// app.UsePresentation();[m
+[32m+[m[32m// app.MapControllers();[m
+[32m+[m
+[32m+[m[32m// app.UseAuthentication();[m
+[32m+[m
+[32m+[m[32m// app.UseAuthorization();[m
+[32m+[m[32m// app.Run();[m
+[32m+[m
+[32m+[m[32mvar builder = WebApplication.CreateBuilder(args);[m
+[32m+[m
+ builder.Services.AddApplication();[m
+ builder.Services.AddInfrastructure(builder.Configuration);[m
+ builder.Services.AddPresentation();[m
+ builder.Services.AddControllers();[m
+ builder.Services.AddHostedService<OutboxProcessor>();[m
+[31m-var app=builder.Build();[m
+[32m+[m
+[32m+[m[32mbuilder.Services.AddSingleton<[m
+[32m+[m[32m    IAuthorizationPolicyProvider,[m
+[32m+[m[32m    PermissionPolicyProvider>();[m
+[32m+[m
+[32m+[m[32mbuilder.Services.AddSingleton<[m
+[32m+[m[32m    IAuthorizationHandler,[m
+[32m+[m[32m    PermissionAuthorizationHandler>();[m
+[32m+[m
+[32m+[m[32mvar jwtOptions = builder.Configuration[m
+[32m+[m[32m    .GetSection(JwtOptions.SectionName)[m
+[32m+[m[32m    .Get<JwtOptions>()[m
+[32m+[m[32m    ?? throw new InvalidOperationException([m
+[32m+[m[32m        "JWT configuration is missing.");[m
+[32m+[m
+[32m+[m[32mbuilder.Services[m
+[32m+[m[32m    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)[m
+[32m+[m[32m    .AddJwtBearer(options =>[m
+[32m+[m[32m    {[m
+[32m+[m[32m        options.TokenValidationParameters = new TokenValidationParameters[m
+[32m+[m[32m        {[m
+[32m+[m[32m            ValidateIssuer = true,[m
+[32m+[m[32m            ValidIssuer = jwtOptions.Issuer,[m
+[32m+[m
+[32m+[m[32m            ValidateAudience = true,[m
+[32m+[m[32m            ValidAudience = jwtOptions.Audience,[m
+[32m+[m
+[32m+[m[32m            ValidateIssuerSigningKey = true,[m
+[32m+[m[32m            IssuerSigningKey = new SymmetricSecurityKey([m
+[32m+[m[32m                Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),[m
+[32m+[m
+[32m+[m[32m            ValidateLifetime = true,[m
+[32m+[m[32m            ClockSkew = TimeSpan.Zero[m
+[32m+[m[32m        };[m
+[32m+[m
+[32m+[m[32m        options.Events = new JwtBearerEvents[m
+[32m+[m[32m        {[m
+[32m+[m[32m            OnMessageReceived = context =>[m
+[32m+[m[32m            {[m
+[32m+[m[32m                Console.WriteLine([m
+[32m+[m[32m                    ">>> JwtBearer: OnMessageReceived");[m
+[32m+[m
+[32m+[m[32m                Console.WriteLine([m
+[32m+[m[32m                    $"Token exists: {!string.IsNullOrWhiteSpace(context.Token)}");[m
+[32m+[m
+[32m+[m[32m                return Task.CompletedTask;[m
+[32m+[m[32m            },[m
+[32m+[m
+[32m+[m[32m            OnAuthenticationFailed = context =>[m
+[32m+[m[32m            {[m
+[32m+[m[32m                Console.WriteLine([m
+[32m+[m[32m                    $">>> JwtBearer FAILED: {context.Exception}");[m
+[32m+[m
+[32m+[m[32m                return Task.CompletedTask;[m
+[32m+[m[32m            },[m
+[32m+[m
+[32m+[m[32m            OnTokenValidated = context =>[m
+[32m+[m[32m            {[m
+[32m+[m[32m                Console.WriteLine([m
+[32m+[m[32m                    ">>> JwtBearer VALIDATED");[m
+[32m+[m
+[32m+[m[32m                return Task.CompletedTask;[m
+[32m+[m[32m            }[m
+[32m+[m[32m        };[m
+[32m+[m[32m    });[m
+[32m+[m
+[32m+[m[32mbuilder.Services.AddSwaggerGen(options =>[m
+[32m+[m[32m{[m
+[32m+[m[32m    options.AddSecurityDefinition([m
+[32m+[m[32m        "Bearer",[m
+[32m+[m[32m        new OpenApiSecurityScheme[m
+[32m+[m[32m        {[m
+[32m+[m[32m            Description =[m
+[32m+[m[32m                "JWT Authorization header using the Bearer scheme.",[m
+[32m+[m[32m            Name = "Authorization",[m
+[32m+[m[32m            In = ParameterLocation.Header,[m
+[32m+[m[32m            Type = SecuritySchemeType.Http,[m
+[32m+[m[32m            Scheme = "Bearer"[m
+[32m+[m[32m        });[m
+[32m+[m[32m});[m
+[32m+[m
+[32m+[m[32mbuilder.Services.AddAuthorization();[m
+[32m+[m
+[32m+[m[32mvar app = builder.Build();[m
+[32m+[m
+ app.UsePresentation();[m
+[32m+[m
+[32m+[m[32mapp.UseAuthentication();[m
+[32m+[m[32mapp.UseAuthorization();[m
+[32m+[m
+ app.MapControllers();[m
+[31m-app.Run();[m
+ [m
+[32m+[m[32mapp.Run();[m
+[1mdiff --git a/src/Services/ProductService/BookStore.ProductService.Api/appsettings.json b/src/Services/ProductService/BookStore.ProductService.Api/appsettings.json[m
+[1mindex 58ebe28..98ecc91 100644[m
+[1m--- a/src/Services/ProductService/BookStore.ProductService.Api/appsettings.json[m
+[1m+++ b/src/Services/ProductService/BookStore.ProductService.Api/appsettings.json[m
+[36m@@ -15,5 +15,12 @@[m
+         "Username": "guest",[m
+         "Password": "guest"[m
+     },[m
+[32m+[m
+[32m+[m[32m"Jwt":{[m
+[32m+[m[32m    "Issuer": "BookStore",[m
+[32m+[m[32m    "Audience": "BookStore.Client",[m
+[32m+[m[32m    "SecretKey": "THIS_IS_A_DEVELOPMENT_SECRET_KEY_CHANGE_IT",[m
+[32m+[m[32m    "ExpirationMinutes": 60[m
+[32m+[m[32m  },[m
+   "AllowedHosts": "*"[m
+ }[m

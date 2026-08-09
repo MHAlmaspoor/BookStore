@@ -12,6 +12,7 @@ using BookStore.IdentityService.Infrastructure.Authentication;
 using BookStore.IdentityService.Application.Abstraction.Authentication;
 using BookStore.IdentityService.Application.Abstraction.Repositories;
 using BookStore.IdentityService.Domain.Roles;
+using BookStore.IdentityService.Application.Abstractions.Authorization;
 
 
 namespace BookStore.IdentityService.Infrastructure.DependencyInjection;
@@ -37,6 +38,7 @@ public static class DependencyInjection
         services.AddScoped<IRefreshTokenGenerator,RefreshTokenGenerator>();
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IPersmissionRepository, PermissionRepository>();
+        services.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
 
         return services;
     }

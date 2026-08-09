@@ -1,5 +1,6 @@
  using BookStore.IdentityService.Application.Abstraction.Authentication;
 using BookStore.IdentityService.Application.Abstraction.Persistance;
+using BookStore.IdentityService.Application.Abstractions.Authorization;
 using BookStore.IdentityService.Application.Abstractions.Persistence;
 using BookStore.IdentityService.Application.Command.Refresh;
 using BookStore.IdentityService.Application.Contracts.Authentication;
@@ -11,6 +12,7 @@ using MediatR;
         private readonly IUserRepository _userRepository;
         private readonly ITokenProvider _tokenProvider;
         private readonly IRefreshTokenGenerator _refreshTokenGenerator;
+        private readonly IUserPermissionRepository _userPermissionRepository;
         private readonly IUnitOfWork _unitOfWork;
 
         public RefreshCommandHandler(
@@ -18,18 +20,22 @@ using MediatR;
             IUserRepository userRepository,
             ITokenProvider tokenProvider,
             IRefreshTokenGenerator refreshTokenGenerator,
+            IUserPermissionRepository userPermissionRepository,
             IUnitOfWork unitOfWork)
         {
             _refreshTokenRepository = refreshTokenRepository;
             _userRepository = userRepository;
             _tokenProvider = tokenProvider;
             _refreshTokenGenerator = refreshTokenGenerator;
+            _userPermissionRepository = userPermissionRepository;
             _unitOfWork = unitOfWork;
         }
 
         public async Task<LoginResponse> Handle(RefreshCommand request, CancellationToken cancellationToken)
         {
             var refreshToken = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken,cancellationToken);
+            var user = await _refreshTokenRepository.GetByIdAsync(refreshToken.UserId, cancellationToken);
+            var permissions = await _userPermissionRepository.GetPermissionsAsync(user.Id, cancellationToken);
 
             if(refreshToken is null)
                 throw new DomainException("Invalid refresh token");
@@ -40,12 +46,12 @@ using MediatR;
             if(refreshToken.IsExpired)
                 throw new DomainException("Refresh token is expired.");
 
-            var user = await _refreshTokenRepository.GetByIdAsync(refreshToken.UserId, cancellationToken);
+
 
             if(user is null)
                 throw new DomainException("User not found");
 
-            var accessToken = _tokenProvider.CreateAccessToken(user);
+            var accessToken = _tokenProvider.CreateAccessToken(user,permissions);
 
             var newRefreshToken = _refreshTokenGenerator.Generate(user.Id, request.Device, request.IpAddress);
 

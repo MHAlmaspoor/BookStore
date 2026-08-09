@@ -11,6 +11,8 @@ using System.Text;
 using Microsoft.OpenApi;
 using BookStore.IdentityService.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using BookStore.IdentityService.Infrastructure.Authorization;
 
 
 
@@ -68,6 +70,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddInfrastructure(builder.Configuration);
 
+
 var jwtOptions = builder.Configuration.GetSection("Jwt").Get<JwtOptions>()!;
 
 
@@ -92,7 +95,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+
+builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 await app.Services.SeedInfrastructureAsync();

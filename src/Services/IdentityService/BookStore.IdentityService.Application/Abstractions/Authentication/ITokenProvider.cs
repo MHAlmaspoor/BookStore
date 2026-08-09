@@ -5,5 +5,5 @@ namespace BookStore.IdentityService.Application.Abstraction.Authentication;
 
 public interface ITokenProvider
 {
-    LoginResponse CreateAccessToken(User user);
+    LoginResponse CreateAccessToken(User user, IReadOnlyCollection<string> permissions);
 }

@@ -1,0 +1,12 @@
+namespace BookStore.IdentityService.Application.Authorization;
+
+using Microsoft.AspNetCore.Authorization;
+public sealed class PermissionRequirement : IAuthorizationRequirement
+{
+    public string Permission { get; }
+
+    public PermissionRequirement (string permission)
+    {
+        Permission = permission;
+    }
+}

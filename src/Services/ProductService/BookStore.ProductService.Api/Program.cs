@@ -71,14 +71,208 @@ using BookStore.ProductService.Api.BackgroundServices;
 using BookStore.ProductService.Application;
 using BookStore.ProductService.Domain.Outbox;
 using BookStore.ProductService.Infrastructure;
-var builder=WebApplication.CreateBuilder(args);
+using BookStore.BuildingBlocks.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using BookStore.ProductService.Infrastructure.Authentication;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.OpenApi;
+
+
+// var builder=WebApplication.CreateBuilder(args);
+// builder.Services.AddApplication();
+// builder.Services.AddInfrastructure(builder.Configuration);
+// builder.Services.AddPresentation();
+// builder.Services.AddControllers();
+// builder.Services.AddHostedService<OutboxProcessor>();
+
+// builder.Services.AddSingleton<
+//     IAuthorizationPolicyProvider,
+//     PermissionPolicyProvider>();
+
+// builder.Services.AddSingleton<
+//     IAuthorizationHandler,
+//     PermissionAuthorizationHandler>();
+
+// var jwtOptions = builder.Configuration
+//     .GetSection(JwtOptions.SectionName)
+//     .Get<JwtOptions>()
+//     ?? throw new InvalidOperationException(
+//         "JWT configuration is missing.");
+
+// builder.Services
+//     .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//     .AddJwtBearer(options =>
+//     {
+//         options.TokenValidationParameters = new TokenValidationParameters
+//         {
+//             ValidateIssuer = true,
+//             ValidIssuer = jwtOptions.Issuer,
+
+//             ValidateAudience = true,
+//             ValidAudience = jwtOptions.Audience,
+
+//             ValidateIssuerSigningKey = true,
+//             IssuerSigningKey = new SymmetricSecurityKey(
+//                 Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),
+
+//             ValidateLifetime = true,
+//             ClockSkew = TimeSpan.Zero
+//         };
+
+//         options.Events = new JwtBearerEvents
+//         {
+//             OnMessageReceived = context =>
+//             {
+//                 Console.WriteLine(
+//                     ">>> JwtBearer: OnMessageReceived");
+
+//                 Console.WriteLine(
+//                     $"Token exists: {!string.IsNullOrWhiteSpace(context.Token)}");
+
+//                 return Task.CompletedTask;
+//             },
+
+//             OnAuthenticationFailed = context =>
+//             {
+//                 Console.WriteLine(
+//                     $">>> JwtBearer FAILED: {context.Exception}");
+
+//                 return Task.CompletedTask;
+//             },
+
+//             OnTokenValidated = context =>
+//             {
+//                 Console.WriteLine(
+//                     ">>> JwtBearer VALIDATED");
+
+//                 return Task.CompletedTask;
+//             }
+//         };
+//     });
+
+
+// builder.Services.AddSwaggerGen(options =>
+// {
+//     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+//     {
+//         Description = "JWT Authorization header using the Bearer scheme.",
+//         Name = "Authorization",
+//         In = ParameterLocation.Header,
+//         Type = SecuritySchemeType.Http,
+//         Scheme = "Bearer"
+//     });
+// });
+
+
+// builder.Services.AddAuthorization();
+// var app=builder.Build();
+// app.UsePresentation();
+// app.MapControllers();
+
+// app.UseAuthentication();
+
+// app.UseAuthorization();
+// app.Run();
+
+var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddPresentation();
 builder.Services.AddControllers();
 builder.Services.AddHostedService<OutboxProcessor>();
-var app=builder.Build();
-app.UsePresentation();
-app.MapControllers();
-app.Run();
 
+builder.Services.AddSingleton<
+    IAuthorizationPolicyProvider,
+    PermissionPolicyProvider>();
+
+builder.Services.AddSingleton<
+    IAuthorizationHandler,
+    PermissionAuthorizationHandler>();
+
+var jwtOptions = builder.Configuration
+    .GetSection(JwtOptions.SectionName)
+    .Get<JwtOptions>()
+    ?? throw new InvalidOperationException(
+        "JWT configuration is missing.");
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtOptions.Issuer,
+
+            ValidateAudience = true,
+            ValidAudience = jwtOptions.Audience,
+
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(jwtOptions.SecretKey)),
+
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                Console.WriteLine(
+                    ">>> JwtBearer: OnMessageReceived");
+
+                Console.WriteLine(
+                    $"Token exists: {!string.IsNullOrWhiteSpace(context.Token)}");
+
+                return Task.CompletedTask;
+            },
+
+            OnAuthenticationFailed = context =>
+            {
+                Console.WriteLine(
+                    $">>> JwtBearer FAILED: {context.Exception}");
+
+                return Task.CompletedTask;
+            },
+
+            OnTokenValidated = context =>
+            {
+                Console.WriteLine(
+                    ">>> JwtBearer VALIDATED");
+
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition(
+        "Bearer",
+        new OpenApiSecurityScheme
+        {
+            Description =
+                "JWT Authorization header using the Bearer scheme.",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.Http,
+            Scheme = "Bearer"
+        });
+});
+
+builder.Services.AddAuthorization();
+
+var app = builder.Build();
+
+app.UsePresentation();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.Run();
