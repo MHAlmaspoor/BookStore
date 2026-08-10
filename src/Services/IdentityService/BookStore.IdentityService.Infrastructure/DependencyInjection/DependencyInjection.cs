@@ -13,6 +13,7 @@ using BookStore.IdentityService.Application.Abstraction.Authentication;
 using BookStore.IdentityService.Application.Abstraction.Repositories;
 using BookStore.IdentityService.Domain.Roles;
 using BookStore.IdentityService.Application.Abstractions.Authorization;
+using BookStore.IdentityService.Infrastructure.Persistence.Interceptors;
 
 
 namespace BookStore.IdentityService.Infrastructure.DependencyInjection;
@@ -24,6 +25,8 @@ public static class DependencyInjection
         services.AddDbContext<IdentityDbContext>(option =>
         {
             option.UseNpgsql(configuration.GetConnectionString("IdentityDatabase"));
+
+            option.AddInterceptors(new InsertOutboxMessagesInterceptor());
         });
 
         services.AddScoped<IUserRepository,UserRepository>();
@@ -39,6 +42,7 @@ public static class DependencyInjection
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IPersmissionRepository, PermissionRepository>();
         services.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
+
 
         return services;
     }
