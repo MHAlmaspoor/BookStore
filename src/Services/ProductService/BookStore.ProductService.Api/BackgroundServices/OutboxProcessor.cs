@@ -3,6 +3,7 @@ using BookStore.ProductService.Application.Abstraction.Messaging;
 using BookStore.ProductService.Domain.Events;
 using BookStore.ProductService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using BookStore.BuildingBlocks.Messaging;
 
 namespace BookStore.ProductService.Api.BackgroundServices;
 

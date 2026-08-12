@@ -1,4 +1,5 @@
 using BookStore.ProductService.Domain.Events;
+using BookStore.BuildingBlocks.Messaging;
 using MediatR;
 
 namespace BookStore.ProductService.Application.Abstraction.Messaging;

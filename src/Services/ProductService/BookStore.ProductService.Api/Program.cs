@@ -78,6 +78,7 @@ using BookStore.ProductService.Infrastructure.Authentication;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi;
+using BookStore.BuildingBlocks.Infrastructure.DependencyInjection;
 
 
 // var builder=WebApplication.CreateBuilder(args);
@@ -266,6 +267,7 @@ builder.Services.AddSwaggerGen(options =>
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddRabbitMq(builder.Configuration);
 var app = builder.Build();
 
 app.UsePresentation();

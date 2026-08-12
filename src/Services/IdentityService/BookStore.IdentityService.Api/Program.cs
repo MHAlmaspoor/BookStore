@@ -13,7 +13,8 @@ using BookStore.IdentityService.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using BookStore.IdentityService.Infrastructure.Authorization;
-
+using BookStore.BuildingBlocks.Infrastructure.DependencyInjection;
+using BookStore.IdentityService.Infrastructure.BackgroundServices;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -99,7 +100,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddSingleton<IAuthorizationPolicyProvider, PermissionPolicyProvider>();
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionAuthorizationHandler>();
 builder.Services.AddAuthorization();
-
+builder.Services.AddRabbitMq(builder.Configuration);
 var app = builder.Build();
 
 await app.Services.SeedInfrastructureAsync();

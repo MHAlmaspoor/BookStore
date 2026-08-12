@@ -3,6 +3,8 @@
   <ItemGroup>
     <ProjectReference Include="..\BookStore.ProductService.Domain\BookStore.ProductService.Domain.csproj" />
     <ProjectReference Include="..\BookStore.ProductService.Application\BookStore.ProductService.Application.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BookStore.BuildingBlocks\BookStore.BuildingBlocks.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BookStore.BuildingBlocks.Infrastructure\BookStore.BuildingBlocks.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

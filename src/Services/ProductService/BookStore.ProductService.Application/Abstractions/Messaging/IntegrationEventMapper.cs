@@ -2,6 +2,7 @@ using BookStore.ProductService.Application.Abstraction.Messaging;
 using BookStore.ProductService.Application.Events.Integration;
 using BookStore.ProductService.Domain.Events;
 using BookStore.ProductService.Domain.Products;
+using BookStore.BuildingBlocks.Messaging;
 
 public sealed class IntegrationEventMapper: IIntegrationEventMapper
 {
@@ -15,7 +16,7 @@ public sealed class IntegrationEventMapper: IIntegrationEventMapper
                 e.Price,
                 e.Currency
             ),
-            
+
         };
     }
 }

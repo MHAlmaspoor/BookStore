@@ -6,9 +6,10 @@ using BookStore.ProductService.Domain.Products;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using BookStore.ProductService.Infrastructure.Messaging;
+using BookStore.BuildingBlocks.Infrastructure.Messaging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
+using BookStore.BuildingBlocks.Messaging;
 using BookStore.ProductService.Application.Abstraction.Messaging;
 
 namespace BookStore.ProductService.Infrastructure;

@@ -14,6 +14,9 @@ using BookStore.IdentityService.Application.Abstraction.Repositories;
 using BookStore.IdentityService.Domain.Roles;
 using BookStore.IdentityService.Application.Abstractions.Authorization;
 using BookStore.IdentityService.Infrastructure.Persistence.Interceptors;
+using BookStore.BuildingBlocks.Messaging;
+using BookStore.IdentityService.Application.Messaging;
+using BookStore.IdentityService.Infrastructure.BackgroundServices;
 
 
 namespace BookStore.IdentityService.Infrastructure.DependencyInjection;
@@ -42,6 +45,8 @@ public static class DependencyInjection
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IPersmissionRepository, PermissionRepository>();
         services.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
+        services.AddScoped<IIntegrationEventMapper,IntegrationEventMapper>();
+        services.AddHostedService<OutboxProcessor>();
 
 
         return services;

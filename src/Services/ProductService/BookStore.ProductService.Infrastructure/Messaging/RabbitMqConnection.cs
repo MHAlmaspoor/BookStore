@@ -1,22 +1,22 @@
-using System.Data;
-using Microsoft.Extensions.Options;
-using RabbitMQ.Client;
+// using System.Data;
+// using Microsoft.Extensions.Options;
+// using RabbitMQ.Client;
 
-namespace BookStore.ProductService.Infrastructure.Messaging;
+// namespace BookStore.ProductService.Infrastructure.Messaging;
 
-public sealed class RabbitMqConnection : IRabbitMqConnection
-{
-    public IConnection Connection { get; }
+// public sealed class RabbitMqConnection : IRabbitMqConnection
+// {
+//     public IConnection Connection { get; }
 
-    public RabbitMqConnection(IConnection connection)
-    {
-        Connection = connection;
-    }
+//     public RabbitMqConnection(IConnection connection)
+//     {
+//         Connection = connection;
+//     }
 
-    public async ValueTask DisposeAsync()
-    {
-        await Connection.DisposeAsync();
-    }
+//     public async ValueTask DisposeAsync()
+//     {
+//         await Connection.DisposeAsync();
+//     }
 
 
-}
+// }

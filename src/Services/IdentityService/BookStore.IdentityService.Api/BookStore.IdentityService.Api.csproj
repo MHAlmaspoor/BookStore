@@ -21,6 +21,7 @@
     <ProjectReference Include="..\BookStore.IdentityService.Application\BookStore.IdentityService.Application.csproj" />
     <ProjectReference Include="..\BookStore.IdentityService.Infrastructure\BookStore.IdentityService.Infrastructure.csproj" />
     <ProjectReference Include="..\BookStore.IdentityService.Contracts\BookStore.IdentityService.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BookStore.BuildingBlocks.Infrastructure\BookStore.BuildingBlocks.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
