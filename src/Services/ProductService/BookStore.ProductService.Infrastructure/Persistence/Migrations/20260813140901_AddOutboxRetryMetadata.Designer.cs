@@ -3,6 +3,7 @@ using System;
 using BookStore.ProductService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookStore.ProductService.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ProductServiceDbContext))]
-    partial class ProductServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260813140901_AddOutboxRetryMetadata")]
+    partial class AddOutboxRetryMetadata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -35,9 +38,6 @@ namespace BookStore.ProductService.Infrastructure.Persistence.Migrations
                     b.Property<string>("Error")
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)");
-
-                    b.Property<bool>("IsPermanentlyFailed")
-                        .HasColumnType("boolean");
 
                     b.Property<DateTime?>("LastAttemptedOnUtc")
                         .HasColumnType("timestamp with time zone");
