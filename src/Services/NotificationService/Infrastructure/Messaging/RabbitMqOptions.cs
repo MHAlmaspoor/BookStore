@@ -1,4 +1,4 @@
-namespace BookStore.NotificationService.Messaging;
+namespace BookStore.NotificationService.Infrastructure.Messaging;
 
 public sealed class RabbitMqOptions
 {

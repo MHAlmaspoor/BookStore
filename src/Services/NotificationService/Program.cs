@@ -1,5 +1,10 @@
+using BookStore.BuildingBlocks.Messaging;
 using BookStore.NotificationService;
-using BookStore.NotificationService.Messaging;
+using BookStore.NotificationService.Application.Abstractions.Messaging;
+using BookStore.NotificationService.Application.Messaging;
+using BookStore.NotificationService.Application.Messaging.Handlers;
+using BookStore.NotificationService.Contracts;
+using BookStore.NotificationService.Infrastructure.Messaging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 
@@ -35,7 +40,22 @@ builder.Services.AddSingleton(sp =>
     return new RabbitMqConnection(connection);
 });
 
-builder.Services.AddSingleton<ProductCreatedConsumer>();
+builder.Services.AddSingleton<RabbitMqConsumer>();
+
+builder.Services.AddScoped<IIntegrationEventHandler<ProductCreatedIntegrationEvent>, ProductCreatedHandler>();
+
+builder.Services.AddScoped<IIntegrationEventHandler<UserRegisteredIntegrationEvent>,UserRegisteredHandler>();
+
+builder .Services.AddSingleton<IIntegrationEventRegistry, IntegrationEventRegistry>();
+
+builder.Services.AddScoped<IIntegrationEventHandlerResolver, IntegrationEventHandlerResolver>();
+
+var eventRegistry = new IntegrationEventRegistry();
+
+eventRegistry.Register<ProductCreatedIntegrationEvent>(RabbitMqRoutingKeys.ProductCreated);
+eventRegistry.Register<UserRegisteredIntegrationEvent>(RabbitMqRoutingKeys.UserRegistered);
+
+builder.Services.AddSingleton<IIntegrationEventRegistry>(eventRegistry);
 
 var host = builder.Build();
 host.Run();

@@ -1,6 +1,6 @@
 using RabbitMQ.Client;
 
-namespace BookStore.NotificationService.Messaging;
+namespace BookStore.NotificationService.Infrastructure.Messaging;
 
 public sealed class RabbitMqConnection
 {
