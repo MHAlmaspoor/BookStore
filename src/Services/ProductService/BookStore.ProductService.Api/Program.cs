@@ -67,9 +67,8 @@
 // app.Run();
 
 using BookStore.ProductService.Api.Extensions;
-using BookStore.ProductService.Api.BackgroundServices;
 using BookStore.ProductService.Application;
-using BookStore.ProductService.Domain.Outbox;
+using BookStore.BuildingBlocks.Persistence.Outbox;
 using BookStore.ProductService.Infrastructure;
 using BookStore.BuildingBlocks.Authorization;
 using Microsoft.AspNetCore.Authorization;

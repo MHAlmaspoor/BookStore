@@ -1,4 +1,4 @@
-namespace BookStore.ProductService.Domain.Common;
+namespace BookStore.BuildingBlocks.Domain;
 
 public interface IAggregateRoot : IHasDomainEvent
 {

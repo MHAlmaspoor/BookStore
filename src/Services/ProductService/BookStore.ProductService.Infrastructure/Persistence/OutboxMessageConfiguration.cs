@@ -1,4 +1,4 @@
-using BookStore.ProductService.Domain.Outbox;
+using BookStore.BuildingBlocks.Persistence.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,6 +15,6 @@ public sealed class OutboxMessageConfiguration : IEntityTypeConfiguration<Outbox
         builder.Property(x=>x.OccuredOnUtc).IsRequired();
         builder.Property(x=>x.ProcessedOnUtc);
         builder.Property(x=>x.Error).HasMaxLength(4000);
-        
+
     }
 }

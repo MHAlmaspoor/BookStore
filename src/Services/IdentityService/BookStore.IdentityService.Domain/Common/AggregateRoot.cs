@@ -1,4 +1,4 @@
-using BookStore.IdentityService.Domain.Events;
+using BookStore.BuildingBlocks.Domain;
 
 namespace BookStore.IdentityService.Domain.Common;
 

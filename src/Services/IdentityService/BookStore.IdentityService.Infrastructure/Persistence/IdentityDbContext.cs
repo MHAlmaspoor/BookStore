@@ -1,16 +1,16 @@
 using BookStore.IdentityService.Domain.Users;
 using BookStore.IdentityService.Domain.RefreshTokens;
-using BookStore.IdentityService.Domain.Outbox;
 using Microsoft.EntityFrameworkCore;
 using BookStore.IdentityService.Application.Abstraction.Persistance;
 using BookStore.IdentityService.Domain.Roles;
 using BookStore.IdentityService.Domain.UserRoles;
 using BookStore.IdentityService.Domain.RolePermissions;
 using BookStore.IdentityService.Domain.Permissions;
+using BookStore.BuildingBlocks.Persistence.Outbox;
 
 namespace BookStore.IdentityService.Infrastructure.Persistence;
 
-public sealed class IdentityDbContext : DbContext,IUnitOfWork
+public sealed class IdentityDbContext : DbContext,IUnitOfWork, IOutboxDbContext
 {
     public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
     {

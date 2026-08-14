@@ -1,5 +1,5 @@
 using BookStore.ProductService.Infrastructure.Persistence;
-using BookStore.ProductService.Infrastructure.Persistence.Interceptors;
+using BookStore.BuildingBlocks.Persistence.Outbox;
 using BookStore.ProductService.Infrastructure.Persistence.Repositories;
 using BookStore.ProductService.Application.Abstraction.Persistance;
 using BookStore.ProductService.Domain.Products;
@@ -45,17 +45,19 @@ public static class DependenctInjection
 
     return new RabbitMqConnection(connection);
 });
-        services.AddScoped<InsertOutboxMessagesInterceptor>();
+        services.AddSingleton<InsertOutboxMessagesInterceptor>();
         services.AddDbContext<ProductServiceDbContext>((sp, option)=>
         {
-            option.UseNpgsql(
-            configuration.GetConnectionString("ProductDatabase"));
+            option.UseNpgsql(configuration.GetConnectionString("ProductDatabase"));
 
             option.AddInterceptors(sp.GetRequiredService<InsertOutboxMessagesInterceptor>());
 
-
     });
 
+        services.AddHostedService<OutboxProcessor>();
+Console.WriteLine(">>> OUTBOX PROCESSOR REGISTERED");
+
+        services.AddScoped<IOutboxDbContext>(sp =>sp.GetRequiredService<ProductServiceDbContext>());
         services.AddScoped<IProductRepository, ProductRepository>();
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();

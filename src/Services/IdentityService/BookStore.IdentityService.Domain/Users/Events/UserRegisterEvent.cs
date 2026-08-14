@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+
 using BookStore.IdentityService.Domain.Events;
 using BookStore.IdentityService.Domain.ValueObjects;
 

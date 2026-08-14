@@ -1,10 +1,10 @@
-using BookStore.ProductService.Domain.Outbox;
+using BookStore.BuildingBlocks.Persistence.Outbox;
 using BookStore.ProductService.Domain.Products;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookStore.ProductService.Infrastructure.Persistence;
 
-public sealed class ProductServiceDbContext : DbContext
+public sealed class ProductServiceDbContext : DbContext, IOutboxDbContext
 {
     public ProductServiceDbContext(DbContextOptions<ProductServiceDbContext> options)
         :base(options)

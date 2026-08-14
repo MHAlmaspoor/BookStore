@@ -1,40 +1,28 @@
-using BookStore.ProductService.Domain.Events;
-using BookStore.BuildingBlocks.Messaging;
 using MediatR;
+
+
+using BookStore.BuildingBlocks.Domain;
 
 namespace BookStore.ProductService.Application.Abstraction.Messaging;
 
 public sealed class DomainEventDispatcher : IDomainEventDispatcher
 {
-    private readonly IPublisher _publisher;
-    private readonly IIntegrationEventMapper _eventMapper;
-    private readonly IEventBus _eventBus;
+    private readonly IMediator _mediator;
 
-    public DomainEventDispatcher(IPublisher publisher, IIntegrationEventMapper eventMapper, IEventBus eventBus)
+    public DomainEventDispatcher(IMediator mediator)
     {
-        _publisher=publisher;
-        _eventMapper=eventMapper;
-        _eventBus=eventBus;
-
+        _mediator = mediator;
     }
 
-    public async Task DispatchAsync(DomainEventContext context, CancellationToken cancellationToken=default)
+    public async Task DispatchAsync(
+        IReadOnlyCollection<IDomainEvent> domainEvents,
+        CancellationToken cancellationToken = default)
     {
-        await _publisher.Publish( context.DomainEvent,cancellationToken);
-        var integrationEvent = _eventMapper.Map(context.DomainEvent);
-
-        Console.WriteLine(integrationEvent?.GetType().FullName);
-
-        Console.WriteLine(
-            System.Text.Json.JsonSerializer.Serialize(
-                integrationEvent,
-                integrationEvent!.GetType()));
-
-        if(integrationEvent is null)
-            return;
-        Console.WriteLine("===== Before Publish =====");
-        Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(integrationEvent));
-        Console.WriteLine("==========================");
-        await _eventBus.PublishAsync(integrationEvent,cancellationToken);
+        foreach (var domainEvent in domainEvents)
+        {
+            await _mediator.Publish(
+                domainEvent,
+                cancellationToken);
+        }
     }
 }

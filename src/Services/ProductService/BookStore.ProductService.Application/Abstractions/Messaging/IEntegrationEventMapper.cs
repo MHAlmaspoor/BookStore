@@ -1,11 +1,11 @@
-using BookStore.ProductService.Domain.Events;
-using BookStore.BuildingBlocks.Messaging;
+// using BookStore.ProductService.Domain.Events;
+// using BookStore.BuildingBlocks.Messaging;
 
-namespace BookStore.ProductService.Application.Abstraction.Messaging;
+// namespace BookStore.ProductService.Application.Abstraction.Messaging;
 
-public interface IIntegrationEventMapper
-{
-    IntegrationEvent? Map(IDomainEvent domainEvent);
-}
+// public interface IIntegrationEventMapper
+// {
+//     IntegrationEvent? Map(IDomainEvent domainEvent);
+// }
 
 

@@ -1,4 +1,4 @@
-using BookStore.ProductService.Domain.Events;
+using BookStore.BuildingBlocks.Domain;
 
 namespace BookStore.ProductService.Domain.Products;
 

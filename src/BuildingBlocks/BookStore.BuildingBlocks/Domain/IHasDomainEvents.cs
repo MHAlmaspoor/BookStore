@@ -1,5 +1,5 @@
-using BookStore.ProductService.Domain.Events;
-namespace BookStore.ProductService.Domain.Common;
+using BookStore.BuildingBlocks.Domain;
+namespace BookStore.BuildingBlocks.Domain;
 
 public interface IHasDomainEvent
 {

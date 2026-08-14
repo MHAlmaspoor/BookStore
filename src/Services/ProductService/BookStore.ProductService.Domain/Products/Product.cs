@@ -1,6 +1,7 @@
 using BookStore.ProductService.Domain.Common;
 using BookStore.ProductService.Domain.Exceptions;
 using BookStore.ProductService.Domain.ValueObjects;
+using BookStore.BuildingBlocks.Domain;
 
 namespace BookStore.ProductService.Domain.Products;
 public sealed class Product:AggregatedRoot

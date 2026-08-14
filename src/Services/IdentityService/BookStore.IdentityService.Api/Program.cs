@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using BookStore.IdentityService.Infrastructure.Authorization;
 using BookStore.BuildingBlocks.Infrastructure.DependencyInjection;
-using BookStore.IdentityService.Infrastructure.BackgroundServices;
+
 
 
 var builder = WebApplication.CreateBuilder(args);

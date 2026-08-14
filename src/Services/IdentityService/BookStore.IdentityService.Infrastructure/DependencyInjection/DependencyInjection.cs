@@ -11,12 +11,11 @@ using Microsoft.Extensions.DependencyInjection;
 using BookStore.IdentityService.Infrastructure.Authentication;
 using BookStore.IdentityService.Application.Abstraction.Authentication;
 using BookStore.IdentityService.Application.Abstraction.Repositories;
-using BookStore.IdentityService.Domain.Roles;
 using BookStore.IdentityService.Application.Abstractions.Authorization;
-using BookStore.IdentityService.Infrastructure.Persistence.Interceptors;
+using BookStore.BuildingBlocks.Persistence.Outbox;
 using BookStore.BuildingBlocks.Messaging;
 using BookStore.IdentityService.Application.Messaging;
-using BookStore.IdentityService.Infrastructure.BackgroundServices;
+
 
 
 namespace BookStore.IdentityService.Infrastructure.DependencyInjection;
@@ -36,6 +35,8 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(sp =>
             sp.GetRequiredService<IdentityDbContext>());
+
+        services.AddScoped<IOutboxDbContext>(sp => sp.GetRequiredService<IdentityDbContext>());
 
         services.AddScoped<IPasswordHasher,BCrptPasswordHasher>();
         services.AddScoped<ITokenProvider, JwtTokenProvider>();

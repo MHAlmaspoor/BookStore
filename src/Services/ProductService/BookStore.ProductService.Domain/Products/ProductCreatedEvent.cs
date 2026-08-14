@@ -1,22 +1,6 @@
-// using BookStore.ProductService.Domain.Events;
-// using MediatR;
-
-// namespace BookStore.ProductService.Domain.Products;
-
-// public sealed class ProductCreatedEvent:INotification
-// {
-//     public Guid ProductId { get; }
-//     public DateTime OccurredOn { get; }
-
-//     public ProductCreatedEvent(Guid productId)
-//     {
-//         ProductId=productId;
-//         OccurredOn=DateTime.Now;
-//     }
-// }
 
 using System.Text.Json.Serialization;
-using BookStore.ProductService.Domain.Events;
+using BookStore.BuildingBlocks.Domain;
 
 namespace BookStore.ProductService.Domain.Products;
 

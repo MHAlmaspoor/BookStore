@@ -10,4 +10,10 @@
     <PackageReference Include="MediatR" Version="14.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\buildingblocks\bookstore.buildingblocks\bookstore.buildingblocks.csproj" />
+  </ItemGroup>
+
+
+
 </Project>

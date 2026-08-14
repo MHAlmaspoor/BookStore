@@ -1,7 +1,6 @@
-
 using MediatR;
 
-namespace BookStore.IdentityService.Domain.Events;
+namespace BookStore.BuildingBlocks.Domain;
 
 public interface IDomainEvent : INotification
 {

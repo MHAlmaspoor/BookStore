@@ -1,8 +1,9 @@
-using BookStore.ProductService.Domain.Events;
+using BookStore.BuildingBlocks.Domain;
 
 namespace BookStore.ProductService.Application.Abstraction.Messaging;
 
 public interface IDomainEventDispatcher
 {
-    Task DispatchAsync(DomainEventContext context, CancellationToken cancellationToken=default);
+    Task DispatchAsync(
+        IReadOnlyCollection<IDomainEvent> domainEvents, CancellationToken cancellationToken = default);
 }
