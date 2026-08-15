@@ -33,8 +33,7 @@ public static class DependencyInjection
 
         services.AddScoped<IUserRepository,UserRepository>();
 
-        services.AddScoped<IUnitOfWork>(sp =>
-            sp.GetRequiredService<IdentityDbContext>());
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<IdentityDbContext>());
 
         services.AddScoped<IOutboxDbContext>(sp => sp.GetRequiredService<IdentityDbContext>());
 

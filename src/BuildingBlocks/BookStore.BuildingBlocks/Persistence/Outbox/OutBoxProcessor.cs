@@ -15,18 +15,14 @@ public sealed class OutboxProcessor : BackgroundService
     private readonly IEventBus _eventBus;
     private readonly ILogger<OutboxProcessor> _logger;
 
-    public OutboxProcessor(
-        IServiceScopeFactory scopeFactory,
-        IEventBus eventBus,
-        ILogger<OutboxProcessor> logger)
+    public OutboxProcessor(IServiceScopeFactory scopeFactory, IEventBus eventBus, ILogger<OutboxProcessor> logger)
     {
         _scopeFactory = scopeFactory;
         _eventBus = eventBus;
         _logger = logger;
     }
 
-    protected override async Task ExecuteAsync(
-        CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Outbox Processor started");
 
@@ -36,13 +32,9 @@ public sealed class OutboxProcessor : BackgroundService
             {
                 using var scope = _scopeFactory.CreateScope();
 
-                var dbContext =
-                    scope.ServiceProvider
-                        .GetRequiredService<IOutboxDbContext>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<IOutboxDbContext>();
 
-                var mapper =
-                    scope.ServiceProvider
-                        .GetRequiredService<IIntegrationEventMapper>();
+                var mapper = scope.ServiceProvider.GetRequiredService<IIntegrationEventMapper>();
 
                 var now = DateTime.UtcNow;
 
@@ -56,16 +48,11 @@ public sealed class OutboxProcessor : BackgroundService
                     .Take(20)
                     .ToListAsync(stoppingToken);
 
-                _logger.LogInformation(
-                    "Found {Count} pending outbox messages",
-                    messages.Count);
+                _logger.LogInformation("Found {Count} pending outbox messages", messages.Count);
 
                 foreach (var message in messages)
                 {
-                    await ProcessMessageAsync(
-                        message,
-                        mapper,
-                        stoppingToken);
+                    await ProcessMessageAsync(message, mapper, stoppingToken);
                 }
 
                 await dbContext.SaveChangesAsync(stoppingToken);
@@ -77,85 +64,54 @@ public sealed class OutboxProcessor : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(
-                    ex,
-                    "Outbox Processor failed.");
+                _logger.LogError(ex, "Outbox Processor failed.");
             }
 
-            await Task.Delay(
-                PollingInterval,
-                stoppingToken);
+            await Task.Delay(PollingInterval, stoppingToken);
         }
 
         _logger.LogInformation("Outbox Processor stopped");
     }
 
-    private async Task ProcessMessageAsync(
-        OutboxMessage message,
-        IIntegrationEventMapper mapper,
-        CancellationToken cancellationToken)
+    private async Task ProcessMessageAsync(OutboxMessage message, IIntegrationEventMapper mapper, CancellationToken cancellationToken)
     {
         try
         {
-            _logger.LogInformation(
-                "Processing OutboxMessage {MessageId} | Type: {Type}",
-                message.Id,
-                message.Type);
+            _logger.LogInformation("Processing OutboxMessage {MessageId} | Type: {Type}", message.Id, message.Type);
 
-            // Mapper مسئول Deserialize و تبدیل DomainEvent
-            // به IntegrationEvent است.
             var integrationEvent = mapper.Map(message);
 
             if (integrationEvent is null)
             {
-                message.MarkAsFailed(
-                    "No integration event mapping found.");
+                message.MarkAsFailed("No integration event mapping found.");
 
                 return;
             }
 
-            _logger.LogInformation(
-                "Publishing {EventType} with routing key {RoutingKey}",
-                integrationEvent.GetType().Name,
-                integrationEvent.RoutingKey);
+            _logger.LogInformation("Publishing {EventType} with routing key {RoutingKey}",
+                integrationEvent.GetType().Name, integrationEvent.RoutingKey);
 
-            await _eventBus.PublishAsync(
-                integrationEvent,
-                cancellationToken);
+            await _eventBus.PublishAsync( integrationEvent, cancellationToken);
 
             message.MarkAsProcessed();
 
-            _logger.LogInformation(
-                "OutboxMessage {MessageId} processed successfully",
-                message.Id);
+            _logger.LogInformation("OutboxMessage {MessageId} processed successfully", message.Id);
         }
         catch (Exception ex)
         {
-            var nextAttempt = CalculateNextAttempt(
-                message.RetryCount);
+            var nextAttempt = CalculateNextAttempt(message.RetryCount);
 
-            message.MarkAsRetry(
-                ex.Message,
-                nextAttempt);
+            message.MarkAsRetry(ex.Message, nextAttempt);
 
-            _logger.LogError(
-                ex,
-                "Error processing OutboxMessage {MessageId}. " +
-                "Retry #{RetryCount}. Next attempt: {NextAttempt}",
-                message.Id,
-                message.RetryCount,
-                nextAttempt);
+            _logger.LogError(ex, "Error processing OutboxMessage {MessageId}. " + "Retry #{RetryCount}. Next attempt: {NextAttempt}",
+                message.Id, message.RetryCount, nextAttempt);
         }
     }
 
-    private static DateTime CalculateNextAttempt(
-        int retryCount)
+    private static DateTime CalculateNextAttempt(int retryCount)
     {
-        var delaySeconds = Math.Min(
-            Math.Pow(2, retryCount),
-            300);
+        var delaySeconds = Math.Min(Math.Pow(2, retryCount), 300);
 
-        return DateTime.UtcNow.AddSeconds(
-            delaySeconds);
+        return DateTime.UtcNow.AddSeconds(delaySeconds);
     }
 }
