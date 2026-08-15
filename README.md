@@ -1,9 +1,10 @@
-BookStore
+# BookStore
 
-A production-oriented .NET 10 microservices-based BookStore project focused on practical software architecture, Domain-Driven Design, messaging, and distributed-systems patterns.
+A production-oriented .NET 10 microservices-based BookStore project focused on practical software architecture, Domain-Driven Design, messaging, distributed systems, and real-world engineering patterns.
 
-Architecture
+## Architecture
 
+```text
 BookStore
 ├── src
 │   ├── BuildingBlocks
@@ -13,47 +14,56 @@ BookStore
 │       ├── ProductService
 │       └── NotificationService
 └── tests
+```
 
-Services
+## Services
 
-IdentityService — authentication, authorization, users, roles, permissions, refresh tokens, and JWT.
+### IdentityService
 
-ProductService — product management and product domain logic.
+Handles authentication, authorization, users, roles, permissions, refresh tokens, and JWT-based security.
 
-NotificationService — consumes integration events and processes notifications.
+### ProductService
 
-Architectural Principles
+Handles product management and product domain logic.
+
+Current functionality includes:
+
+* Product creation
+* Product retrieval
+* Product price changes
+* Product deletion
+* Redis-based distributed caching
+* Cache-Aside pattern
+* Cache invalidation
+
+### NotificationService
+
+Consumes integration events and processes notifications asynchronously through RabbitMQ.
+
+## Architectural Principles
 
 The project demonstrates:
 
-Clean Architecture
+* Clean Architecture
+* Domain-Driven Design (DDD)
+* Domain Events
+* Integration Events
+* CQRS-oriented application structure
+* Dependency Inversion
+* Repository Pattern
+* Unit of Work
+* Transactional Outbox Pattern
+* Event-driven communication
+* RabbitMQ messaging
+* Redis distributed caching
 
-Domain-Driven Design (DDD)
+The architecture is intentionally evolving as new infrastructure and patterns are introduced.
 
-Domain Events
-
-Integration Events
-
-CQRS-oriented application structure
-
-Dependency Inversion
-
-Repository Pattern
-
-Unit of Work
-
-Transactional Outbox Pattern
-
-Event-driven communication
-
-RabbitMQ messaging
-
-Redis / distributed caching
-
-Messaging
+## Messaging
 
 Inter-service communication uses asynchronous integration events.
 
+```text
 Domain Action
      ↓
 Domain Event
@@ -69,140 +79,243 @@ RabbitMQ
 Integration Event
      ↓
 Consumer
+```
 
-The Transactional Outbox Pattern helps keep database changes and event persistence in the same transaction, reducing the risk of losing events between database updates and message publishing.
+The Transactional Outbox Pattern keeps database changes and event persistence within the same transaction, reducing the risk of losing events between database updates and message publishing.
 
-BuildingBlocks
+## BuildingBlocks
 
 Shared cross-cutting concerns are gradually extracted into:
 
+```text
 src/BuildingBlocks/BookStore.BuildingBlocks
+```
 
 Current shared concerns include:
 
-Domain abstractions
-
-Aggregate root contracts
-
-Domain event contracts
-
-Integration event contracts
-
-Event bus abstractions
-
-RabbitMQ infrastructure
-
-Transactional Outbox infrastructure
-
-Outbox message processing
-
-Authorization building blocks
+* Domain abstractions
+* Aggregate root contracts
+* Domain event contracts
+* Integration event contracts
+* Event bus abstractions
+* RabbitMQ infrastructure
+* Transactional Outbox infrastructure
+* Outbox message processing
+* Authorization building blocks
 
 The shared layer is intentionally kept independent of service-specific domain models.
 
-Persistence
+## Persistence
 
 The services use:
 
-Entity Framework Core 10
+* Entity Framework Core 10
+* PostgreSQL
+* EF Core migrations
+* Transactional Outbox
 
+Service-specific EF Core configurations remain inside each service's Infrastructure layer.
+
+## Distributed Caching
+
+ProductService currently uses Redis as a distributed cache.
+
+The caching strategy follows the Cache-Aside pattern:
+
+```text
+Get Product
+     ↓
+   Redis
+     │
+ ┌───┴────┐
+ │        │
+HIT      MISS
+ │        │
+ ▼        ▼
+Return  PostgreSQL
+          │
+          ▼
+        Redis
+          │
+          ▼
+        Return
+```
+
+For data-changing operations, the corresponding cache entry is invalidated after the database operation succeeds.
+
+### Update
+
+```text
+Update Product
+      ↓
 PostgreSQL
+      ↓
+Redis.Remove(product:{id})
+```
 
-EF Core migrations
+### Delete
 
+```text
+Delete Product
+      ↓
+PostgreSQL
+      ↓
+Redis.Remove(product:{id})
+```
+
+This keeps PostgreSQL as the source of truth while Redis acts as a performance-oriented read cache.
+
+Current caching features include:
+
+* Redis distributed cache
+* Cache-Aside pattern
+* Cache HIT/MISS handling
+* Absolute cache expiration (TTL)
+* Cache invalidation on product updates
+* Cache invalidation on product deletion
+
+## Messaging and Caching
+
+The project currently explores two important distributed-system concerns independently:
+
+```text
+Messaging
+    ↓
 Transactional Outbox
-
-Service-specific EF Core configurations are kept inside each service's Infrastructure layer.
-
-Technologies
-
-.NET 10
-
-C#
-
-ASP.NET Core
-
-Entity Framework Core
-
-PostgreSQL
-
+    ↓
 RabbitMQ
+```
 
+and:
+
+```text
+Caching
+    ↓
 Redis
+    ↓
+Cache-Aside
+    ↓
+Cache Invalidation
+```
 
-MediatR
+Future work will address failure scenarios and consistency concerns between distributed components.
 
-FluentValidation
+## Technologies
 
-Docker / Docker Compose
+* .NET 10
+* C#
+* ASP.NET Core
+* Entity Framework Core 10
+* PostgreSQL
+* RabbitMQ
+* Redis
+* MediatR
+* FluentValidation
+* Docker / Docker Compose
+* xUnit
+* Moq
 
-xUnit
+## Development
 
-Moq
+Clone the repository:
 
-Development
-
+```bash
 git clone https://github.com/MHAlmaspoor/BookStore.git
 cd BookStore
+```
 
+Restore dependencies:
+
+```bash
 dotnet restore
+```
+
+Build the solution:
+
+```bash
 dotnet build
+```
 
 Run infrastructure dependencies with Docker Compose when applicable:
 
+```bash
 docker compose up -d
+```
 
-Configuration
+## Configuration
 
 Environment-specific configuration and secrets should not be committed to the repository.
 
-Use local .env files or development configuration for credentials and environment-specific settings.
+Use local `.env` files or development configuration for credentials and environment-specific settings.
 
-An .env.example file can document required variables without exposing real credentials.
+An `.env.example` file can document required variables without exposing real credentials.
 
-Testing
+## Testing
 
 Run all tests with:
 
+```bash
 dotnet test
+```
 
-Git Workflow
+The project also contains API test collections for manually testing service endpoints and integration flows.
+
+## Git Workflow
 
 Development is organized around feature branches:
 
+```text
 main
   ↑
 develop
   ↑
 feature/*
+```
 
-Features are developed and committed independently before being integrated into develop.
+Features are developed and committed independently before being integrated into `develop`.
 
 ## Current Status
 
 ### Completed
 
-- [x] Product Domain
-- [x] Identity Domain
-- [x] Domain Events
-- [x] Integration Events
-- [x] RabbitMQ Event Bus
-- [x] Routing Keys
-- [x] Notification Consumer
-- [x] Outbox Pattern
-- [x] Shared Outbox Processor
+* [x] Product Domain
+* [x] Identity Domain
+* [x] Domain Events
+* [x] Integration Events
+* [x] RabbitMQ Event Bus
+* [x] Routing Keys
+* [x] Notification Consumer
+* [x] Transactional Outbox Pattern
+* [x] Shared Outbox Processor
+* [x] Product Create API
+* [x] Product Get API
+* [x] Product Price Update API
+* [x] Product Delete API
+* [x] Redis Infrastructure
+* [x] Distributed Caching
+* [x] Cache-Aside Pattern
+* [x] Cache HIT/MISS handling
+* [x] Cache TTL
+* [x] Cache Invalidation on Update
+* [x] Cache Invalidation on Delete
 
 ### Next
 
-- [ ] Redis
-- [ ] Caching
-- [ ] Distributed caching
-- [ ] ...
+* [ ] Redis failure handling
+* [ ] Cache consistency strategies
+* [ ] Retry strategies for distributed operations
+* [ ] Resilience and fault tolerance
+* [ ] Additional Product APIs
+* [ ] Further microservices
+* [ ] Observability
+* [ ] Performance and load testing
 
+## Project Direction
 
+This project is intentionally evolving beyond a simple CRUD application.
 
-This project is intentionally evolving beyond a simple CRUD application to explore real-world microservices architecture and engineering practices.
+The goal is to incrementally build and understand a production-oriented microservices system while applying practical architectural patterns, distributed messaging, transactional consistency, caching, resilience, and other real-world software engineering practices.
 
-License
+## License
 
 MIT
