@@ -1,4 +1,7 @@
+using BookStore.ProductService.Application.Products.Command.ChangeProductPrice;
 using BookStore.ProductService.Application.Products.Command.CreateProduct;
+using BookStore.ProductService.Application.Products.Command.DeleteProduct;
+using BookStore.ProductService.Application.Products.Command.GetProduct;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,8 +29,29 @@ public class ProductsController:ControllerBase
     }
 
     [HttpGet("{id:guid}")]
-    public IActionResult GetById(Guid id)
+    public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
-        return Ok();
+        var result = await _sender.Send(new GetProductQuery(id), cancellationToken);
+
+        if(result is null)
+            return NotFound();
+
+        return Ok(result);
+    }
+
+    [HttpPut("{id:guid}/price")]
+    public async Task<IActionResult> ChangePrice(Guid id,[FromBody]ChangeProductPriceCommand request, CancellationToken cancellationToken)
+    {
+        await _sender.Send( new ChangeProductPriceCommand(id, request.Price, request.Currency), cancellationToken);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        await _sender.Send(new DeleteProductCommand(id), cancellationToken);
+
+        return NoContent();
     }
 }

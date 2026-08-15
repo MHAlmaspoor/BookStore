@@ -11,6 +11,8 @@ using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using BookStore.BuildingBlocks.Messaging;
 using BookStore.ProductService.Application.Abstraction.Messaging;
+using BookStore.ProductService.Application.Abstraction.Caching;
+using BookStore.ProductService.Infrastructure.Caching;
 
 namespace BookStore.ProductService.Infrastructure;
 
@@ -65,6 +67,13 @@ Console.WriteLine(">>> OUTBOX PROCESSOR REGISTERED");
         services.AddScoped<InsertOutboxMessagesInterceptor>();
 
         services.AddSingleton<IIntegrationEventMapper,IntegrationEventMapper>();
+
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = configuration.GetConnectionString("Redis");
+        });
+        services.AddScoped<IProductCache, RedisProductCache>();
+
         return services;
 
     }
