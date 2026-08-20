@@ -298,10 +298,10 @@ Features are developed and committed independently before being integrated into 
 * [x] Cache TTL
 * [x] Cache Invalidation on Update
 * [x] Cache Invalidation on Delete
+* [x] Redis failure handling
 
 ### Next
 
-* [ ] Redis failure handling
 * [ ] Cache consistency strategies
 * [ ] Retry strategies for distributed operations
 * [ ] Resilience and fault tolerance
@@ -314,7 +314,7 @@ Features are developed and committed independently before being integrated into 
 
 This project is intentionally evolving beyond a simple CRUD application.
 
-The goal is to incrementally build and understand a production-oriented microservices system while applying practical architectural patterns, distributed messaging, transactional consistency, caching, resilience, and other real-world software engineering practices.
+The goal is to incrementally build a production-oriented microservices system while applying practical architectural patterns, distributed messaging, transactional consistency, caching, resilience, and other real-world software engineering practices.
 
 ## License
 

@@ -13,6 +13,10 @@ using BookStore.BuildingBlocks.Messaging;
 using BookStore.ProductService.Application.Abstraction.Messaging;
 using BookStore.ProductService.Application.Abstraction.Caching;
 using BookStore.ProductService.Infrastructure.Caching;
+using Polly;
+using Polly.Retry;
+using StackExchange.Redis;
+using Polly.CircuitBreaker;
 
 namespace BookStore.ProductService.Infrastructure;
 
@@ -73,6 +77,31 @@ Console.WriteLine(">>> OUTBOX PROCESSOR REGISTERED");
             options.Configuration = configuration.GetConnectionString("Redis");
         });
         services.AddScoped<IProductCache, RedisProductCache>();
+
+        services.AddResiliencePipeline("redis", builder =>
+        {
+            builder.AddRetry(new RetryStrategyOptions
+            {
+                MaxRetryAttempts = 2,
+                Delay = TimeSpan.FromMicroseconds(200),
+                BackoffType = DelayBackoffType.Exponential,
+                UseJitter = true,
+
+                ShouldHandle = new PredicateBuilder()
+                    .Handle<RedisConnectionException>()
+                    .Handle<RedisTimeoutException>()
+            });
+
+            builder.AddTimeout(TimeSpan.FromSeconds(2));
+
+            builder.AddCircuitBreaker(new CircuitBreakerStrategyOptions
+            {
+                FailureRatio = 0.5,
+                SamplingDuration = TimeSpan.FromSeconds(30),
+                MinimumThroughput = 5,
+                BreakDuration = TimeSpan.FromSeconds(15)
+            });
+        });
 
         return services;
 
