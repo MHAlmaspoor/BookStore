@@ -285,31 +285,23 @@ Features are developed and committed independently before being integrated into 
 * [x] RabbitMQ Event Bus
 * [x] Routing Keys
 * [x] Notification Consumer
-* [x] Transactional Outbox Pattern
+* [x] Transactional Outbox
 * [x] Shared Outbox Processor
-* [x] Product Create API
-* [x] Product Get API
-* [x] Product Price Update API
-* [x] Product Delete API
 * [x] Redis Infrastructure
-* [x] Distributed Caching
-* [x] Cache-Aside Pattern
-* [x] Cache HIT/MISS handling
-* [x] Cache TTL
-* [x] Cache Invalidation on Update
-* [x] Cache Invalidation on Delete
-* [x] Redis failure handling
+* [x] Product Cache-Aside
+* [x] Cache Invalidation
+* [x] Cache Consistency Strategies
+* [x] Retry Strategies for Distributed Operations
+* [x] Resilience and Fault Tolerance
+* [x] Additional Product APIs
 
 ### Next
 
-* [ ] Cache consistency strategies
-* [ ] Retry strategies for distributed operations
-* [ ] Resilience and fault tolerance
-* [ ] Additional Product APIs
-* [ ] Further microservices
+* [ ] Further Product APIs
+* [ ] Further Microservices
 * [ ] Observability
-* [ ] Performance and load testing
-
+* [ ] Performance and Load Testing
+* [ ] CI/CD
 ## Project Direction
 
 This project is intentionally evolving beyond a simple CRUD application.
