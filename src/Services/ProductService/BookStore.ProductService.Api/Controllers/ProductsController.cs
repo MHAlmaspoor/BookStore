@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using BookStore.ProductService.Application.Products.Command.ChangeProductPrice;
 using BookStore.ProductService.Application.Products.Command.CreateProduct;
 using BookStore.ProductService.Application.Products.Command.DeleteProduct;
@@ -5,6 +6,7 @@ using BookStore.ProductService.Application.Products.Command.GetProduct;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace BookStore.ProductService.Api.Controllers;
 
@@ -14,10 +16,13 @@ namespace BookStore.ProductService.Api.Controllers;
 public class ProductsController:ControllerBase
 {
     private readonly ISender _sender;
+
+    private readonly HealthCheckService _healthCheckService;
     public ProductsController(ISender sender)
     {
         _sender=sender;
     }
+
 
     [HttpPost]
     [Authorize(Policy = "permission:product:create")]
@@ -54,4 +59,7 @@ public class ProductsController:ControllerBase
 
         return NoContent();
     }
+
+
+
 }

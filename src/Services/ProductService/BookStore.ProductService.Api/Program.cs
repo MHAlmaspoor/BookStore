@@ -78,6 +78,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi;
 using BookStore.BuildingBlocks.Infrastructure.DependencyInjection;
+using BookStore.ProductService.Infrastructure.HealthChecks;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 
 // var builder=WebApplication.CreateBuilder(args);
@@ -267,6 +269,18 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddAuthorization();
 
 builder.Services.AddRabbitMq(builder.Configuration);
+
+builder.Services
+    .AddHealthChecks()
+    .AddNpgSql(builder.Configuration.GetConnectionString("ProductDatabase")!,
+        name: "postgres",
+        tags: ["ready"])
+    .AddRedis(builder.Configuration.GetConnectionString("Redis")!,
+        name: "redis",
+        tags: ["redis"])
+    .AddCheck<RabbitMqHealthCheck>("rabbitmq", failureStatus: HealthStatus.Degraded, tags: ["ready"]);
+
+
 var app = builder.Build();
 
 app.UsePresentation();
@@ -275,5 +289,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHealthChecks("/health");
 
 app.Run();

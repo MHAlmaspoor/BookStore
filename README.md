@@ -297,7 +297,7 @@ Features are developed and committed independently before being integrated into 
 
 ### Next
 
-* [ ] Further Product APIs
+* [ ] Complete Product APIs
 * [ ] Further Microservices
 * [ ] Observability
 * [ ] Performance and Load Testing
