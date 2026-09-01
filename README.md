@@ -310,7 +310,7 @@ RabbitMQ Consumer
 
 Trace context is persisted in the Outbox message and propagated through RabbitMQ using the traceparent header.
 
-Jaeger
+## Jaeger
 
 Distributed traces can be visualized using Jaeger.
 
@@ -320,7 +320,7 @@ http://localhost:16686
 
 The tracing infrastructure uses OpenTelemetry and OTLP to export telemetry data to Jaeger.
 
-Health Checks
+## Health Checks
 
 Health checks are available for:
 
