@@ -6,6 +6,8 @@ public sealed class OutboxMessage
     public DateTime OccuredOnUtc { get; private set; }
     public string Type { get; private set; } = string.Empty;
     public string Content { get; private set; } = string.Empty;
+    public string? TraceParent { get; private set; }
+    public string? TraceState { get; private set; }
     public DateTime? ProcessedOnUtc { get; private set; }
     public string? Error { get; private set; }
     public int RetryCount { get; private set; }
@@ -17,12 +19,15 @@ public sealed class OutboxMessage
     {
     }
 
-    public OutboxMessage(Guid id, DateTime occurredOnUtc, string type, string content)
+    public OutboxMessage(Guid id, DateTime occurredOnUtc, string type, string content, string? traceParent = null, string? traceState = null)
     {
         Id = id;
         OccuredOnUtc = occurredOnUtc;
         Type = type;
         Content = content;
+        TraceParent = traceParent;
+        TraceState = traceState;
+        ;
     }
 
     public void MarkAsProcessed()

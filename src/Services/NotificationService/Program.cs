@@ -6,9 +6,21 @@ using BookStore.NotificationService.Application.Messaging.Handlers;
 using BookStore.NotificationService.Contracts;
 using BookStore.NotificationService.Infrastructure.Messaging;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using RabbitMQ.Client;
 
 var builder = Host.CreateApplicationBuilder(args);
+builder.Services.AddOpenTelemetry().ConfigureResource(resource => resource.AddService("BookStore.NotificationService"))
+    .WithTracing(tracking =>
+    {
+        tracking.AddSource("BookStore.NotificationService.RabbitMQ")
+        .AddConsoleExporter()
+        .AddOtlpExporter(options =>
+        {
+            options.Endpoint = new Uri("http://localhost:4317");
+        });
+    });
 builder.Services.AddHostedService<Worker>();
 
 builder.Services.Configure<RabbitMqOptions>(

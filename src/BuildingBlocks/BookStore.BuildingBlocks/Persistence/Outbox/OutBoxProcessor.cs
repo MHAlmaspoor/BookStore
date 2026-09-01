@@ -1,15 +1,18 @@
+using System.Diagnostics;
 using BookStore.BuildingBlocks.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
+using OpenTelemetry.Context.Propagation;
 namespace BookStore.BuildingBlocks.Persistence.Outbox;
 
 public sealed class OutboxProcessor : BackgroundService
 {
-    private static readonly TimeSpan PollingInterval =
-        TimeSpan.FromSeconds(5);
+    private static readonly TimeSpan PollingInterval = TimeSpan.FromSeconds(5);
+
+    private static readonly ActivitySource ActivitySource = new("BookStore.BuildingBlocks.Outbox");
+    private static readonly TextMapPropagator Propagator = Propagators.DefaultTextMapPropagator;
 
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IEventBus _eventBus;
@@ -78,6 +81,24 @@ public sealed class OutboxProcessor : BackgroundService
         try
         {
             _logger.LogInformation("Processing OutboxMessage {MessageId} | Type: {Type}", message.Id, message.Type);
+
+            var parentContext = Propagator.Extract(default, message, static (OutboxMessage,key) =>
+            {
+                if(key == "traceparent" && !string.IsNullOrWhiteSpace(OutboxMessage.TraceParent))
+                    return [OutboxMessage.TraceParent];
+                if(key == "tracestate" && !string.IsNullOrWhiteSpace(OutboxMessage.TraceState))
+                    return [OutboxMessage.TraceState];
+                return [];
+            });
+
+            using var activity = ActivitySource.StartActivity("Outbox Process", ActivityKind.Producer, parentContext.ActivityContext);
+
+            activity?.SetTag("messaging.system","bookstore");
+            activity?.SetTag("messaging.destination.name","outbox");
+            activity?.SetTag("outbox.message_id",message.Id);
+            activity?.SetTag("outbox.event_type",message.Type);
+
+
 
             var integrationEvent = mapper.Map(message);
 

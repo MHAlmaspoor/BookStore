@@ -272,6 +272,76 @@ develop
 feature/*
 ```
 
+## Observability
+
+The BookStore microservices currently provide end-to-end distributed observability using OpenTelemetry.
+
+### Distributed Tracing
+
+Tracing is implemented across:
+
+- ASP.NET Core HTTP requests
+- EF Core database operations
+- PostgreSQL
+- Redis cache operations
+- Transactional Outbox processing
+- RabbitMQ event publishing
+- RabbitMQ event consumption
+- Cross-service trace context propagation
+
+A single distributed trace can follow the complete flow:
+
+```text
+HTTP Request
+    ↓
+ProductService
+    ↓
+EF Core / PostgreSQL
+    ↓
+Transactional Outbox
+    ↓
+RabbitMQ Publish
+    ↓
+NotificationService
+    ↓
+RabbitMQ Consumer
+
+
+Trace context is persisted in the Outbox message and propagated through RabbitMQ using the traceparent header.
+
+Jaeger
+
+Distributed traces can be visualized using Jaeger.
+
+Jaeger is available at:
+
+http://localhost:16686
+
+The tracing infrastructure uses OpenTelemetry and OTLP to export telemetry data to Jaeger.
+
+Health Checks
+
+Health checks are available for:
+
+PostgreSQL
+Redis
+RabbitMQ
+
+Health endpoints:
+
+/api/health
+/api/health/live
+/api/health/ready
+Resilience
+
+The infrastructure includes resilience mechanisms for distributed dependencies such as:
+
+Redis timeout handling
+Redis fallback behavior
+Circuit breaker protection
+Retry strategies
+Transactional Outbox retry handling with exponential backoff
+
 Features are developed and committed independently before being integrated into `develop`.
 
 ## Current Status
@@ -294,12 +364,12 @@ Features are developed and committed independently before being integrated into 
 * [x] Retry Strategies for Distributed Operations
 * [x] Resilience and Fault Tolerance
 * [x] Additional Product APIs
+* [x] Observability
 
 ### Next
 
-* [ ] Complete Product APIs
+* [ ] Further  Product APIs
 * [ ] Further Microservices
-* [ ] Observability
 * [ ] Performance and Load Testing
 * [ ] CI/CD
 ## Project Direction

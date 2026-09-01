@@ -25,7 +25,7 @@ public class ProductsController:ControllerBase
 
 
     [HttpPost]
-    [Authorize(Policy = "permission:product:create")]
+    //[Authorize(Policy = "permission:product:create")]
     public async Task<ActionResult<Guid>> Create(CreateProductCommand command, CancellationToken cancellationToken)
     {
         var id=await _sender.Send(command,cancellationToken);

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json;
 using BookStore.ProductService.Application.Abstraction.Caching;
 using BookStore.ProductService.Application.Products.Command.GetProduct;
@@ -15,6 +16,7 @@ public sealed class RedisProductCache : IProductCache
     private readonly IDistributedCache _cache;
     private readonly ILogger<RedisProductCache> _logger;
     private readonly ResiliencePipeline _redisPipline;
+    private static readonly ActivitySource ActivitySource = new("BookStore.ProductService.Redis");
 
     //private static readonly TimeSpan RedisTimeout = TimeSpan.FromSeconds(2);
 
@@ -29,6 +31,9 @@ public sealed class RedisProductCache : IProductCache
 
     public async Task<ProductResponse?> GetAsync(Guid productId, CancellationToken cancellationToken = default)
     {
+        using var activity = ActivitySource.StartActivity("Redis Get", ActivityKind.Client);
+        activity?.SetTag("product.id", productId);
+
         var key = BuildKey(productId);
 
         try
@@ -40,8 +45,12 @@ public sealed class RedisProductCache : IProductCache
             var json = await _redisPipline.ExecuteAsync(async ct => await _cache.GetStringAsync(key,ct), cancellationToken);
 
             if (json is null)
+            {
+                activity?.SetTag("cache hit", false);
                 return null;
+            }
 
+            activity?.SetTag("cache.hit", true);
             return JsonSerializer.Deserialize<ProductResponse>(json, JsonOptions);
         }
         catch (OperationCanceledException)

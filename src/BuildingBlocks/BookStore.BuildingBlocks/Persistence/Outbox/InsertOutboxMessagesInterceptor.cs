@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using BookStore.BuildingBlocks.Domain;
@@ -41,7 +42,11 @@ public sealed class InsertOutboxMessagesInterceptor : SaveChangesInterceptor
             {
                 var content = JsonSerializer.Serialize(domainEvent, domainEvent.GetType(), _serializerOptions);
 
-                var outboxMessage = new OutboxMessage(Guid.CreateVersion7(), DateTime.UtcNow, domainEvent.GetType().AssemblyQualifiedName!, content);
+                var traceParent = Activity.Current?.Id;
+                var traceState = Activity.Current?.TraceStateString;
+
+                var outboxMessage = new OutboxMessage(Guid.CreateVersion7(), DateTime.UtcNow, domainEvent.GetType().AssemblyQualifiedName!, content,
+                    traceParent, traceState);
 
                 context.Set<OutboxMessage>().Add(outboxMessage);
             }

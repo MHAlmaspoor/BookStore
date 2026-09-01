@@ -3,6 +3,7 @@ using System;
 using BookStore.ProductService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookStore.ProductService.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ProductServiceDbContext))]
-    partial class ProductServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260828131858_AddTraceContextToOutbox")]
+    partial class AddTraceContextToOutbox
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
