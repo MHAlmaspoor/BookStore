@@ -306,6 +306,7 @@ NotificationService
     ↓
 RabbitMQ Consumer
 
+```
 
 Trace context is persisted in the Outbox message and propagated through RabbitMQ using the traceparent header.
 
