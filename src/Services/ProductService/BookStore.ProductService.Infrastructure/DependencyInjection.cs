@@ -76,6 +76,7 @@ Console.WriteLine(">>> OUTBOX PROCESSOR REGISTERED");
         {
             options.Configuration = configuration.GetConnectionString("Redis");
         });
+
         services.AddScoped<IProductCache, RedisProductCache>();
 
         services.AddResiliencePipeline("redis", builder =>

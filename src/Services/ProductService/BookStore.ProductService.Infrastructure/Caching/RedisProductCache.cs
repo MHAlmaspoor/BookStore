@@ -38,6 +38,7 @@ public sealed class RedisProductCache : IProductCache
 
         try
         {
+
             // using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
             // timeoutCts.CancelAfter(RedisTimeout);
@@ -84,7 +85,7 @@ public sealed class RedisProductCache : IProductCache
         {
             await _redisPipline.ExecuteAsync(async ct =>
             {
-                await _cache.RemoveAsync(BuildKey(productId), cancellationToken);
+                await _cache.RemoveAsync(BuildKey(productId), ct);
             });
         }
         catch (RedisConnectionException ex)

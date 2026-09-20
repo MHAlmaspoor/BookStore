@@ -33,4 +33,7 @@
   <Folder Name="/src/BuildingBlocks/BookStore.BuildingBlocks/">
     <Project Path="src/BuildingBlocks/BookStore.BuildingBlocks/BookStore.BuildingBlocks.csproj" />
   </Folder>
+  <Folder Name="/tests/Bookstore.PerformaceTests/">
+    <Project Path="tests/BookStore.PerformanceTests/BookStore.PerformanceTests.csproj" />
+  </Folder>
 </Solution>
