@@ -366,12 +366,12 @@ Features are developed and committed independently before being integrated into 
 * [x] Resilience and Fault Tolerance
 * [x] Additional Product APIs
 * [x] Observability
+* [x] Performance and Load Testing
 
 ### Next
 
 * [ ] Further  Product APIs
 * [ ] Further Microservices
-* [ ] Performance and Load Testing
 * [ ] CI/CD
 ## Project Direction
 
