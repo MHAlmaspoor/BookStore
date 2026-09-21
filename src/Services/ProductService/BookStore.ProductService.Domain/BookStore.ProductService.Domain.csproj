@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Buildingblocks\Bookstore.BuildingBlocks\Bookstore.BuildingBlocks.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\Bookstore.BuildingBlocks\Bookstore.BuildingBlocks.csproj" />
   </ItemGroup>
 
 
