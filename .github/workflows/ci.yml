@@ -31,7 +31,11 @@ jobs:
             dotnet nuget list source
 
       - name: Restore
-        run: dotnet restore --verbosity diagnostic
+        shell: bash
+        run: |
+            set -o pipefail
+            dotnet restore --verbosity detailed 2>&1 | tee restore.log
+            exit ${PIPESTATUS[0]}
 
       - name: Build
         run: dotnet build --no-restore --configuration Release
