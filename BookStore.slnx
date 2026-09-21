@@ -28,7 +28,7 @@
     <Project Path="tests/BookStore.IdentityService.Domain.Tests/bookStore.IdentityService.Domain.Tests.csproj" />
   </Folder>
   <Folder Name="/src/BuildingBlocks/">
-    <Project Path="src/BuildingBlocks/Bookstore.BuildingBlocks.Infrastructure/Bookstore.BuildingBlocks.Infrastructure.csproj" />
+    <Project Path="src/BuildingBlocks/BookStore.BuildingBlocks.Infrastructure/BookStore.BuildingBlocks.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/src/BuildingBlocks/BookStore.BuildingBlocks/">
     <Project Path="src/BuildingBlocks/BookStore.BuildingBlocks/BookStore.BuildingBlocks.csproj" />
