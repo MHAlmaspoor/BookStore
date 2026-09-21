@@ -37,6 +37,13 @@ jobs:
             dotnet restore --verbosity detailed 2>&1 | tee restore.log
             exit ${PIPESTATUS[0]}
 
+      - name: Upload restore log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+         name: restore-log
+         path: restore.log
+
       - name: Build
         run: dotnet build --no-restore --configuration Release
 
