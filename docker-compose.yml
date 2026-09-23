@@ -16,10 +16,14 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+    networks:
+      - bookstore-network
+
 
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin
+    restart: unless-stopped
 
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@example.com
@@ -30,6 +34,9 @@ services:
 
     depends_on:
       - postgres
+
+    networks:
+      - bookstore-network
 
 
   rabbitmq:
@@ -49,7 +56,6 @@ services:
       - bookstore-network
 
 
-
   redis:
     image: redis:7-alpine
     container_name: bookstore-redis
@@ -64,20 +70,53 @@ services:
     networks:
       - bookstore-network
 
+
   jaeger:
-   image: jaegertracing/all-in-one:latest
-   container_name: bookstore-jaeger
-   restart: unless-stopped
-   ports:
-    - "16686:16686"
-    - "4317:4317"
-    - "4318:4318"
+    image: jaegertracing/all-in-one:latest
+    container_name: bookstore-jaeger
+    restart: unless-stopped
+
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+
+    networks:
+      - bookstore-network
+
+
+  productservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: bookstore-productservice
+    restart: unless-stopped
+
+    environment:
+      ConnectionStrings__ProductDatabase: "Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__Redis: "redis:6379"
+
+      RabbitMQ__Host: "rabbitmq"
+
+      OpenTelemetry__OtlpEndpoint: "http://jaeger:4317"
+
+    ports:
+      - "5039:8080"
+
+    depends_on:
+      - postgres
+      - rabbitmq
+      - redis
+      - jaeger
+
+    networks:
+      - bookstore-network
 
 
 volumes:
 
   postgres_data:
-
   redis_data:
 
 
@@ -85,4 +124,3 @@ networks:
 
   bookstore-network:
     driver: bridge
-
