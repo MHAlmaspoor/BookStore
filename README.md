@@ -1,3 +1,4 @@
+````markdown
 # BookStore
 
 A production-oriented .NET 10 microservices-based BookStore project focused on practical software architecture, Domain-Driven Design, messaging, distributed systems, and real-world engineering patterns.
@@ -13,14 +14,27 @@ BookStore
 │       ├── IdentityService
 │       ├── ProductService
 │       └── NotificationService
-└── tests
-```
+├── tests
+├── api-tests
+├── docker-compose.yml
+├── Dockerfile
+├── Dockerfile.identity
+└── Dockerfile.notification
+````
 
 ## Services
 
 ### IdentityService
 
-Handles authentication, authorization, users, roles, permissions, refresh tokens, and JWT-based security.
+Handles:
+
+* Authentication
+* Authorization
+* Users
+* Roles
+* Permissions
+* Refresh tokens
+* JWT-based security
 
 ### ProductService
 
@@ -35,10 +49,18 @@ Current functionality includes:
 * Redis-based distributed caching
 * Cache-Aside pattern
 * Cache invalidation
+* Resilience policies
 
 ### NotificationService
 
-Consumes integration events and processes notifications asynchronously through RabbitMQ.
+Consumes integration events asynchronously through RabbitMQ.
+
+Current consumers include:
+
+* `product.created`
+* `user.registered`
+
+The service runs as a .NET Worker and processes RabbitMQ messages asynchronously.
 
 ## Architectural Principles
 
@@ -56,6 +78,9 @@ The project demonstrates:
 * Event-driven communication
 * RabbitMQ messaging
 * Redis distributed caching
+* Distributed tracing
+* Resilience patterns
+* Containerized microservices
 
 The architecture is intentionally evolving as new infrastructure and patterns are introduced.
 
@@ -78,10 +103,34 @@ RabbitMQ
      ↓
 Integration Event
      ↓
-Consumer
+NotificationService Consumer
 ```
 
 The Transactional Outbox Pattern keeps database changes and event persistence within the same transaction, reducing the risk of losing events between database updates and message publishing.
+
+## Event Flow
+
+A typical user registration flow is:
+
+```text
+Client
+  ↓
+IdentityService
+  ↓
+PostgreSQL
+  ↓
+Transactional Outbox
+  ↓
+Outbox Processor
+  ↓
+RabbitMQ
+  ↓
+NotificationService
+  ↓
+UserRegisteredHandler
+```
+
+The same event-driven architecture is used for ProductService integration events.
 
 ## BuildingBlocks
 
@@ -173,45 +222,218 @@ Current caching features include:
 * Absolute cache expiration (TTL)
 * Cache invalidation on product updates
 * Cache invalidation on product deletion
+* Redis timeout handling
+* Retry strategies
+* Circuit breaker protection
+* Graceful fallback behavior
 
-## Messaging and Caching
+## Docker
 
-The project currently explores two important distributed-system concerns independently:
+All three microservices are containerized:
 
 ```text
-Messaging
-    ↓
+┌─────────────────────────────────────────────┐
+│              Docker Compose                 │
+│                                             │
+│  ┌───────────────┐   ┌──────────────────┐  │
+│  │ ProductService│   │ IdentityService  │  │
+│  │    :5039      │   │      :5040       │  │
+│  └───────┬───────┘   └────────┬─────────┘  │
+│          │                    │             │
+│          └──────────┬─────────┘             │
+│                     ▼                       │
+│              ┌─────────────┐                │
+│              │  RabbitMQ   │                │
+│              │    :5672    │                │
+│              └──────┬──────┘                │
+│                     │                       │
+│                     ▼                       │
+│            ┌─────────────────┐              │
+│            │NotificationService│             │
+│            │    Worker       │              │
+│            └─────────────────┘              │
+│                                             │
+│  PostgreSQL :5432                           │
+│  Redis      :6379                           │
+│  Jaeger     :16686 / OTLP 4317             │
+└─────────────────────────────────────────────┘
+```
+
+Dockerfiles:
+
+```text
+Dockerfile
+Dockerfile.identity
+Dockerfile.notification
+```
+
+The Docker images use multi-stage builds to keep runtime images smaller and separate build-time dependencies from production runtime dependencies.
+
+## Docker Compose Infrastructure
+
+The local distributed environment includes:
+
+* PostgreSQL
+* pgAdmin
+* RabbitMQ
+* Redis
+* Jaeger
+* ProductService
+* IdentityService
+* NotificationService
+
+Start the complete environment with:
+
+```bash
+docker compose up -d
+```
+
+Check running containers:
+
+```bash
+docker compose ps
+```
+
+View service logs:
+
+```bash
+docker logs bookstore-productservice
+docker logs bookstore-identityservice
+docker logs bookstore-notificationservice
+```
+
+## Observability
+
+The BookStore microservices provide distributed observability using OpenTelemetry.
+
+### Distributed Tracing
+
+Tracing is implemented across:
+
+* ASP.NET Core HTTP requests
+* EF Core database operations
+* PostgreSQL
+* Redis cache operations
+* Transactional Outbox processing
+* RabbitMQ event publishing
+* RabbitMQ event consumption
+* Cross-service trace context propagation
+
+A distributed trace can follow a flow such as:
+
+```text
+HTTP Request
+     ↓
+ProductService / IdentityService
+     ↓
+EF Core / PostgreSQL
+     ↓
 Transactional Outbox
-    ↓
-RabbitMQ
+     ↓
+RabbitMQ Publish
+     ↓
+NotificationService
+     ↓
+RabbitMQ Consumer
 ```
 
-and:
+Trace context is persisted in the Outbox message and propagated through RabbitMQ using the `traceparent` header.
+
+### Jaeger
+
+Distributed traces can be visualized using Jaeger.
+
+Jaeger UI:
 
 ```text
-Caching
-    ↓
-Redis
-    ↓
-Cache-Aside
-    ↓
-Cache Invalidation
+http://localhost:16686
 ```
 
-Future work will address failure scenarios and consistency concerns between distributed components.
+The tracing infrastructure uses OpenTelemetry and OTLP to export telemetry data to Jaeger.
+
+## Health Checks
+
+Health checks cover infrastructure dependencies such as:
+
+* PostgreSQL
+* Redis
+* RabbitMQ
+
+The readiness endpoint currently used for validation is:
+
+```text
+/api/health/ready
+```
+
+For example:
+
+```text
+GET /api/health/ready
+```
+
+The endpoint reports the readiness state of the service dependencies.
+
+## Resilience
+
+The infrastructure includes resilience mechanisms for distributed dependencies such as:
+
+* Redis timeout handling
+* Redis fallback behavior
+* Circuit breaker protection
+* Retry strategies
+* Transactional Outbox retry handling
+* Exponential backoff
+
+## CI
+
+GitHub Actions currently performs:
+
+```text
+Checkout
+   ↓
+.NET 10 Setup
+   ↓
+Restore
+   ↓
+Build
+   ↓
+Test
+```
+
+The CI pipeline is being extended to validate Docker image builds for all three microservices:
+
+```text
+Restore
+   ↓
+Build
+   ↓
+Test
+   ↓
+Docker Build
+   ├── ProductService
+   ├── IdentityService
+   └── NotificationService
+```
+
+Docker images are currently built for validation only. Publishing images to a container registry will be introduced as part of the CD phase.
 
 ## Technologies
 
 * .NET 10
 * C#
 * ASP.NET Core
+* .NET Worker Services
 * Entity Framework Core 10
 * PostgreSQL
 * RabbitMQ
 * Redis
 * MediatR
 * FluentValidation
-* Docker / Docker Compose
+* OpenTelemetry
+* Jaeger
+* Docker
+* Docker Compose
+* GitHub Actions
 * xUnit
 * Moq
 
@@ -236,7 +458,7 @@ Build the solution:
 dotnet build
 ```
 
-Run infrastructure dependencies with Docker Compose when applicable:
+Run the complete local environment:
 
 ```bash
 docker compose up -d
@@ -272,78 +494,9 @@ develop
 feature/*
 ```
 
-## Observability
-
-The BookStore microservices currently provide end-to-end distributed observability using OpenTelemetry.
-
-### Distributed Tracing
-
-Tracing is implemented across:
-
-- ASP.NET Core HTTP requests
-- EF Core database operations
-- PostgreSQL
-- Redis cache operations
-- Transactional Outbox processing
-- RabbitMQ event publishing
-- RabbitMQ event consumption
-- Cross-service trace context propagation
-
-A single distributed trace can follow the complete flow:
-
-```text
-HTTP Request
-    ↓
-ProductService
-    ↓
-EF Core / PostgreSQL
-    ↓
-Transactional Outbox
-    ↓
-RabbitMQ Publish
-    ↓
-NotificationService
-    ↓
-RabbitMQ Consumer
-
-```
-
-Trace context is persisted in the Outbox message and propagated through RabbitMQ using the traceparent header.
-
-## Jaeger
-
-Distributed traces can be visualized using Jaeger.
-
-Jaeger is available at:
-
-http://localhost:16686
-
-The tracing infrastructure uses OpenTelemetry and OTLP to export telemetry data to Jaeger.
-
-## Health Checks
-
-Health checks are available for:
-
-PostgreSQL
-Redis
-RabbitMQ
-
-Health endpoints:
-
-/api/health
-/api/health/live
-/api/health/ready
-Resilience
-
-The infrastructure includes resilience mechanisms for distributed dependencies such as:
-
-Redis timeout handling
-Redis fallback behavior
-Circuit breaker protection
-Retry strategies
-Transactional Outbox retry handling with exponential backoff
-
 Features are developed and committed independently before being integrated into `develop`.
+
+The project follows Conventional Commit style for commit messages.
 
 ## Current Status
 
@@ -365,20 +518,38 @@ Features are developed and committed independently before being integrated into 
 * [x] Retry Strategies for Distributed Operations
 * [x] Resilience and Fault Tolerance
 * [x] Additional Product APIs
-* [x] Observability
+* [x] Distributed Observability
+* [x] Jaeger Integration
 * [x] Performance and Load Testing
+* [x] ProductService Dockerization
+* [x] IdentityService Dockerization
+* [x] NotificationService Dockerization
+* [x] Docker Compose Environment
+* [x] CI Restore / Build / Test
+
+### In Progress
+
+* [ ] Docker image builds in CI
+* [ ] CI/CD container image pipeline
 
 ### Next
 
-* [ ] Further  Product APIs
+* [ ] Container registry integration
+* [ ] CD pipeline
+* [ ] Further Product APIs
 * [ ] Further Microservices
-* [ ] CI/CD
+* [ ] Production hardening
+* [ ] Security hardening
+
 ## Project Direction
 
 This project is intentionally evolving beyond a simple CRUD application.
 
-The goal is to incrementally build a production-oriented microservices system while applying practical architectural patterns, distributed messaging, transactional consistency, caching, resilience, and other real-world software engineering practices.
+The goal is to incrementally build a production-oriented microservices system while applying practical architectural patterns, distributed messaging, transactional consistency, caching, resilience, observability, containerization, and CI/CD practices.
 
 ## License
 
 MIT
+
+```
+```

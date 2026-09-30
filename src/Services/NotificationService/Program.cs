@@ -18,13 +18,12 @@ builder.Services.AddOpenTelemetry().ConfigureResource(resource => resource.AddSe
         .AddConsoleExporter()
         .AddOtlpExporter(options =>
         {
-            options.Endpoint = new Uri("http://localhost:4317");
+            options.Endpoint = new Uri(builder.Configuration["OpenTelemetry:OtlpEndpoint"] ?? "http://localhost:4317");
         });
     });
 builder.Services.AddHostedService<Worker>();
 
-builder.Services.Configure<RabbitMqOptions>(
-    builder.Configuration.GetSection(RabbitMqOptions.SectionName));
+builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection(RabbitMqOptions.SectionName));
 
 builder.Services.AddSingleton(sp =>
 {

@@ -25,8 +25,7 @@ public static class DependenctInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddSingleton<IEventBus,RabbitMqEventBus>();
-        services.Configure<RabbitMqOptions>(
-        configuration.GetSection(RabbitMqOptions.SectionName));
+        services.Configure<RabbitMqOptions>(configuration.GetSection(RabbitMqOptions.SectionName));
     services.AddSingleton<IRabbitMqConnection>(sp =>
 {
     var settings = sp

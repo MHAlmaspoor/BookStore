@@ -35,7 +35,8 @@ builder.Services.AddOpenTelemetry()
             .AddConsoleExporter()
             .AddOtlpExporter(options =>
             {
-                options.Endpoint = new Uri("http://localhost:4317");
+                options.Endpoint = new Uri(builder.Configuration["OpenTelemetry:OtlpEndpoint"]
+                    ?? "http://localhost:4317");
             });
     });
 

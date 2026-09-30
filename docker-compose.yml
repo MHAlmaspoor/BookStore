@@ -1,5 +1,4 @@
 services:
-
   postgres:
     image: postgres:17
     container_name: bookstore-postgres
@@ -112,8 +111,55 @@ services:
 
     networks:
       - bookstore-network
+  identityservice:
+    build:
+      context: .
+      dockerfile: Dockerfile.identity
+
+    container_name: bookstore-identityservice
+    restart: unless-stopped
+
+    environment:
+      ConnectionStrings__IdentityDatabase: "Host=postgres;Port=5432;Database=BookStoreIdentityDb;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+
+      RabbitMQ__Host: "rabbitmq"
+      RabbitMQ__Port: "5672"
+      RabbitMQ__Username: "${RABBITMQ_USER}"
+      RabbitMQ__Password: "${RABBITMQ_PASSWORD}"
+
+      Jwt__Issuer: "BookStore"
+      Jwt__Audience: "BookStore.Client"
+      Jwt__SecretKey: "THIS_IS_A_DEVELOPMENT_SECRET_KEY_CHANGE_IT"
+      Jwt__ExpirationMinutes: "60"
+
+    ports:
+      - "5040:8080"
+
+    depends_on:
+      - postgres
+      - rabbitmq
+
+    networks:
+      - bookstore-network
 
 
+  notificationservice:
+    build:
+      context: .
+      dockerfile: Dockerfile.notification
+    container_name: bookstore-notificationservice
+    restart: unless-stopped
+    environment:
+      RabbitMQ__Host: "rabbitmq"
+      RabbitMQ__Port: "5672"
+      RabbitMQ__UserName: "${RABBITMQ_USER}"
+      RabbitMQ__Password: "${RABBITMQ_PASSWORD}"
+      OpenTelemetry__OtlpEndpoint: "http://jaeger:4317"
+    depends_on:
+      - rabbitmq
+      - jaeger
+    networks:
+      - bookstore-network
 volumes:
 
   postgres_data:
@@ -124,3 +170,4 @@ networks:
 
   bookstore-network:
     driver: bridge
+
