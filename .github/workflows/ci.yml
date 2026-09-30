@@ -24,28 +24,23 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Environment
-        run: |
-            dotnet --info
-            dotnet --list-sdks
-            dotnet nuget list source
-
       - name: Restore
-        shell: bash
-        run: |
-            set -o pipefail
-            dotnet restore --verbosity detailed 2>&1 | tee restore.log
-            exit ${PIPESTATUS[0]}
-
-      - name: Upload restore log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-         name: restore-log
-         path: restore.log
+        run: dotnet restore
 
       - name: Build
         run: dotnet build --no-restore --configuration Release
 
       - name: Test
         run: dotnet test --no-build --configuration Release
+
+      - name: Build ProductService Docker image
+        run: |
+          docker build --file Dockerfile --tag bookstore-productservice:ci .
+
+      - name: Build IdentityService Docker image
+        run: |
+          docker build --file Dockerfile.identity --tag bookstore-identityservice:ci .
+
+      - name: Build NotificationService Docker image
+        run: |
+          docker build --file Dockerfile.notification --tag bookstore-notificationservice:ci .
