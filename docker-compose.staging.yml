@@ -1,0 +1,104 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: bookstore-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bookstore-network
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: bookstore-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    networks:
+      - bookstore-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: bookstore-redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - bookstore-network
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: bookstore-jaeger
+    restart: unless-stopped
+    networks:
+      - bookstore-network
+
+  productservice:
+    image: ghcr.io/mhalmaspoor/bookstore-productservice:${IMAGE_TAG:-develop}
+    container_name: bookstore-productservice
+    restart: unless-stopped
+    environment:
+      ConnectionStrings__ProductDatabase: "Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      ConnectionStrings__Redis: "redis:6379"
+      RabbitMQ__Host: "rabbitmq"
+      OpenTelemetry__OtlpEndpoint: "http://jaeger:4317"
+    ports:
+      - "5039:8080"
+    depends_on:
+      - postgres
+      - rabbitmq
+      - redis
+      - jaeger
+    networks:
+      - bookstore-network
+
+  identityservice:
+    image: ghcr.io/mhalmaspoor/bookstore-identityservice:${IMAGE_TAG:-develop}
+    container_name: bookstore-identityservice
+    restart: unless-stopped
+    environment:
+      ConnectionStrings__IdentityDatabase: "Host=postgres;Port=5432;Database=BookStoreIdentityDb;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+      RabbitMQ__Host: "rabbitmq"
+      RabbitMQ__Port: "5672"
+      RabbitMQ__Username: "${RABBITMQ_USER}"
+      RabbitMQ__Password: "${RABBITMQ_PASSWORD}"
+      Jwt__Issuer: "BookStore"
+      Jwt__Audience: "BookStore.Client"
+      Jwt__SecretKey: "${JWT_SECRET_KEY}"
+      Jwt__ExpirationMinutes: "60"
+    ports:
+      - "5040:8080"
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - bookstore-network
+
+  notificationservice:
+    image: ghcr.io/mhalmaspoor/bookstore-notificationservice:${IMAGE_TAG:-develop}
+    container_name: bookstore-notificationservice
+    restart: unless-stopped
+    environment:
+      RabbitMQ__Host: "rabbitmq"
+      RabbitMQ__Port: "5672"
+      RabbitMQ__Username: "${RABBITMQ_USER}"
+      RabbitMQ__Password: "${RABBITMQ_PASSWORD}"
+      OpenTelemetry__OtlpEndpoint: "http://jaeger:4317"
+    depends_on:
+      - rabbitmq
+      - jaeger
+    networks:
+      - bookstore-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  bookstore-network:
+    driver: bridge
