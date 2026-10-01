@@ -1,4 +1,4 @@
-using BookStore.ProductService.Domain.Events;
+using BookStore.BuildingBlocks.Domain;
 using BookStore.ProductService.Domain.Common;
 
 namespace BookStore.ProductService.Application.Abstraction.Messaging;

@@ -1,4 +1,4 @@
-using BookStore.NotificationService.Messaging;
+using BookStore.NotificationService.Infrastructure.Messaging;
 
 namespace BookStore.NotificationService;
 
@@ -6,9 +6,9 @@ public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
     private readonly RabbitMqConnection _connection;
-    private readonly ProductCreatedConsumer _consumer;
+    private readonly RabbitMqConsumer _consumer;
 
-    public  Worker(ILogger<Worker> logger, RabbitMqConnection connection, ProductCreatedConsumer consumer)
+    public  Worker(ILogger<Worker> logger, RabbitMqConnection connection, RabbitMqConsumer consumer)
     {
         _logger=logger;
         _connection=connection;

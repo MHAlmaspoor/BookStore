@@ -19,4 +19,9 @@ public sealed class ProductRepository:IProductRepository
     {
         return await _context.Products.FindAsync(id,cancellationToken);
     }
+
+    public void Delete(Product product)
+    {
+        _context.Products.Remove(product);
+    }
 }

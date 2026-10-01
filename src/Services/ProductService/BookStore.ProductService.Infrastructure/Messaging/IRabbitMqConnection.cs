@@ -1,9 +1,9 @@
-using System.Data;
-using RabbitMQ.Client;
+// using System.Data;
+// using RabbitMQ.Client;
 
-namespace BookStore.ProductService.Infrastructure.Messaging;
+// namespace BookStore.ProductService.Infrastructure.Messaging;
 
-public interface IRabbitMqConnection : IAsyncDisposable
-{
-    IConnection Connection {get;}
-}
+// public interface IRabbitMqConnection : IAsyncDisposable
+// {
+//     IConnection Connection {get;}
+// }

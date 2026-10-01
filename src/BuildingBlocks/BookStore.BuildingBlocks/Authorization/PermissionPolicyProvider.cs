@@ -1,0 +1,28 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
+
+namespace BookStore.BuildingBlocks.Authorization;
+
+public sealed class PermissionPolicyProvider : DefaultAuthorizationPolicyProvider
+{
+    public const string perfix = "permission:";
+
+    public PermissionPolicyProvider(IOptions<AuthorizationOptions> options)
+        :base(options)
+    {
+    }
+
+    public override Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
+    {
+        if(!policyName.StartsWith(perfix, StringComparison.OrdinalIgnoreCase))
+            return base.GetPolicyAsync(policyName);
+
+        var permission = policyName[perfix.Length..];
+
+        var policy = new AuthorizationPolicyBuilder()
+            .AddRequirements(new PermissionRequirement(permission))
+            .Build();
+
+        return Task.FromResult<AuthorizationPolicy?>(policy);
+    }
+}

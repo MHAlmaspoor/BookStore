@@ -1,0 +1,14 @@
+info:
+  name: Add
+  type: http
+
+http:
+  method: POST
+  url: http://localhost:5039/api/products
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

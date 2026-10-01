@@ -22,7 +22,7 @@ namespace BookStore.ProductService.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("BookStore.ProductService.Domain.Outbox.OutboxMessage", b =>
+            modelBuilder.Entity("BookStore.BuildingBlocks.Persistence.Outbox.OutboxMessage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -36,11 +36,29 @@ namespace BookStore.ProductService.Infrastructure.Persistence.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("character varying(4000)");
 
+                    b.Property<bool>("IsPermanentlyFailed")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastAttemptedOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("NextAttemptOnUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime>("OccuredOnUtc")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime?>("ProcessedOnUtc")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("RetryCount")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TraceParent")
+                        .HasColumnType("text");
+
+                    b.Property<string>("TraceState")
+                        .HasColumnType("text");
 
                     b.Property<string>("Type")
                         .IsRequired()

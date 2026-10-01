@@ -3,6 +3,8 @@
   <ItemGroup>
     <ProjectReference Include="..\BookStore.ProductService.Domain\BookStore.ProductService.Domain.csproj" />
     <ProjectReference Include="..\BookStore.ProductService.Application\BookStore.ProductService.Application.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BookStore.BuildingBlocks\BookStore.BuildingBlocks.csproj" />
+    <ProjectReference Include="..\..\..\BuildingBlocks\BookStore.BuildingBlocks.Infrastructure\BookStore.BuildingBlocks.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -12,8 +14,11 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.11" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Resilience" Version="10.0.10" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.18.0-beta.1" />
     <PackageReference Include="RabbitMQ.Client" Version="7.2.1" />
   </ItemGroup>
 

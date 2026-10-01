@@ -1,13 +1,29 @@
+using BookStore.BuildingBlocks.Messaging;
 using BookStore.NotificationService;
-using BookStore.NotificationService.Messaging;
+using BookStore.NotificationService.Application.Abstractions.Messaging;
+using BookStore.NotificationService.Application.Messaging;
+using BookStore.NotificationService.Application.Messaging.Handlers;
+using BookStore.NotificationService.Contracts;
+using BookStore.NotificationService.Infrastructure.Messaging;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using RabbitMQ.Client;
 
 var builder = Host.CreateApplicationBuilder(args);
+builder.Services.AddOpenTelemetry().ConfigureResource(resource => resource.AddService("BookStore.NotificationService"))
+    .WithTracing(tracking =>
+    {
+        tracking.AddSource("BookStore.NotificationService.RabbitMQ")
+        .AddConsoleExporter()
+        .AddOtlpExporter(options =>
+        {
+            options.Endpoint = new Uri(builder.Configuration["OpenTelemetry:OtlpEndpoint"] ?? "http://localhost:4317");
+        });
+    });
 builder.Services.AddHostedService<Worker>();
 
-builder.Services.Configure<RabbitMqOptions>(
-    builder.Configuration.GetSection(RabbitMqOptions.SectionName));
+builder.Services.Configure<RabbitMqOptions>(builder.Configuration.GetSection(RabbitMqOptions.SectionName));
 
 builder.Services.AddSingleton(sp =>
 {
@@ -35,7 +51,22 @@ builder.Services.AddSingleton(sp =>
     return new RabbitMqConnection(connection);
 });
 
-builder.Services.AddSingleton<ProductCreatedConsumer>();
+builder.Services.AddSingleton<RabbitMqConsumer>();
+
+builder.Services.AddScoped<IIntegrationEventHandler<ProductCreatedIntegrationEvent>, ProductCreatedHandler>();
+
+builder.Services.AddScoped<IIntegrationEventHandler<UserRegisteredIntegrationEvent>,UserRegisteredHandler>();
+
+builder .Services.AddSingleton<IIntegrationEventRegistry, IntegrationEventRegistry>();
+
+builder.Services.AddScoped<IIntegrationEventHandlerResolver, IntegrationEventHandlerResolver>();
+
+var eventRegistry = new IntegrationEventRegistry();
+
+eventRegistry.Register<ProductCreatedIntegrationEvent>(RabbitMqRoutingKeys.ProductCreated);
+eventRegistry.Register<UserRegisteredIntegrationEvent>(RabbitMqRoutingKeys.UserRegistered);
+
+builder.Services.AddSingleton<IIntegrationEventRegistry>(eventRegistry);
 
 var host = builder.Build();
 host.Run();

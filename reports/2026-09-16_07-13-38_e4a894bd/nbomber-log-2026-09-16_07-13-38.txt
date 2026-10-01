@@ -1,0 +1,19 @@
+2026-09-16 10:43:38.345 +03:30 [INF] [ThreadId:2] NBomber 6.6.0 started a new session: 2026-09-16_07-13-38_e4a894bd
+2026-09-16 10:43:38.351 +03:30 [INF] [ThreadId:2] NBomber started as single node
+2026-09-16 10:43:38.354 +03:30 [INF] [ThreadId:2] License validation....
+2026-09-16 10:43:38.354 +03:30 [WRN] [ThreadId:2] THIS VERSION IS FREE ONLY FOR PERSONAL USE. You can't use it for an organization.
+2026-09-16 10:43:38.377 +03:30 [INF] [ThreadId:2] Reports folder: C:\Program Files\dotnet\reports\2026-09-16_07-13-38_e4a894bd
+2026-09-16 10:43:38.379 +03:30 [INF] [ThreadId:2] Plugins: no plugins were loaded
+2026-09-16 10:43:38.382 +03:30 [INF] [ThreadId:2] Reporting sinks: no reporting sinks were loaded
+2026-09-16 10:43:38.383 +03:30 [INF] [ThreadId:2] Starting init...
+2026-09-16 10:43:38.396 +03:30 [INF] [ThreadId:2] Target scenarios: get_product_cache_hit
+2026-09-16 10:43:38.401 +03:30 [INF] [ThreadId:2] Init finished
+2026-09-16 10:43:38.423 +03:30 [INF] [ThreadId:2] Starting warm up...
+2026-09-16 10:43:38.426 +03:30 [INF] [ThreadId:2] Warm up for scenarios: get_product_cache_hit
+2026-09-16 10:43:38.434 +03:30 [INF] [ThreadId:2] Warm up duration: 00:00:10
+2026-09-16 10:43:49.570 +03:30 [INF] [ThreadId:65] Starting bombing...
+2026-09-16 10:44:21.536 +03:30 [INF] [ThreadId:9] Waiting on scenarios completion...
+2026-09-16 10:44:27.876 +03:30 [WRN] [ThreadId:93] Stopping test early: stop command activated by CLI
+2026-09-16 10:44:51.223 +03:30 [INF] [ThreadId:97] Calculating final statistics...
+2026-09-16 10:44:51.635 +03:30 [INF] [ThreadId:12] Reports saved in folder: D:\Projects\BookShop\reports\2026-09-16_07-13-38_e4a894bd
+2026-09-16 10:44:51.636 +03:30 [WRN] [ThreadId:12] THIS VERSION IS FREE ONLY FOR PERSONAL USE. You can't use it for an organization.
