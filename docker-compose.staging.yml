@@ -65,7 +65,7 @@ services:
       ConnectionStrings__IdentityDatabase: "Host=postgres;Port=5432;Database=BookStoreIdentityDb;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
       RabbitMQ__Host: "rabbitmq"
       RabbitMQ__Port: "5672"
-      RabbitMQ__Username: "${RABBITMQ_USER}"
+      RabbitMQ__UserName: "${RABBITMQ_USER}"
       RabbitMQ__Password: "${RABBITMQ_PASSWORD}"
       Jwt__Issuer: "BookStore"
       Jwt__Audience: "BookStore.Client"
@@ -86,7 +86,7 @@ services:
     environment:
       RabbitMQ__Host: "rabbitmq"
       RabbitMQ__Port: "5672"
-      RabbitMQ__Username: "${RABBITMQ_USER}"
+      RabbitMQ__UserName: "${RABBITMQ_USER}"
       RabbitMQ__Password: "${RABBITMQ_PASSWORD}"
       OpenTelemetry__OtlpEndpoint: "http://jaeger:4317"
     depends_on:
