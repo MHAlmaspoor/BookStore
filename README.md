@@ -1,4 +1,3 @@
-````markdown
 # BookStore
 
 A production-oriented .NET 10 microservices-based BookStore project focused on practical software architecture, Domain-Driven Design, messaging, distributed systems, and real-world engineering patterns.
@@ -400,7 +399,7 @@ Build
 Test
 ```
 
-The CI pipeline is being extended to validate Docker image builds for all three microservices:
+The CI pipeline validates Docker image builds for all three microservices:
 
 ```text
 Restore
@@ -526,16 +525,15 @@ The project follows Conventional Commit style for commit messages.
 * [x] NotificationService Dockerization
 * [x] Docker Compose Environment
 * [x] CI Restore / Build / Test
+* [x] CI Docker image builds for all services
 
 ### In Progress
 
-* [ ] Docker image builds in CI
-* [ ] CI/CD container image pipeline
+* [ ] Container registry integration
+* [ ] CD pipeline
 
 ### Next
 
-* [ ] Container registry integration
-* [ ] CD pipeline
 * [ ] Further Product APIs
 * [ ] Further Microservices
 * [ ] Production hardening
