@@ -414,7 +414,7 @@ Docker Build
    └── NotificationService
 ```
 
-Docker images are currently built for validation only. Publishing images to a container registry will be introduced as part of the CD phase.
+Docker images are built for validation on every CI run. Pushes to `main` or `develop` also publish versioned images to GitHub Container Registry (GHCR) using both the commit SHA and branch name as tags.
 
 ## Technologies
 
@@ -529,7 +529,7 @@ The project follows Conventional Commit style for commit messages.
 
 ### In Progress
 
-* [ ] Container registry integration
+* [x] GitHub Container Registry (GHCR) integration
 * [ ] CD pipeline
 
 ### Next
