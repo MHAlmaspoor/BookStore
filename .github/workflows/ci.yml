@@ -11,6 +11,9 @@ on:
       - main
       - develop
 
+permissions:
+  contents: read
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -44,3 +47,54 @@ jobs:
       - name: Build NotificationService Docker image
         run: |
           docker build --file Dockerfile.notification --tag bookstore-notificationservice:ci .
+
+  publish-images:
+    name: Publish container images
+    needs: build-and-test
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push ProductService image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ghcr.io/mhalmaspoor/bookstore-productservice:${{ github.sha }}
+            ghcr.io/mhalmaspoor/bookstore-productservice:${{ github.ref_name }}
+
+      - name: Build and push IdentityService image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.identity
+          push: true
+          tags: |
+            ghcr.io/mhalmaspoor/bookstore-identityservice:${{ github.sha }}
+            ghcr.io/mhalmaspoor/bookstore-identityservice:${{ github.ref_name }}
+
+      - name: Build and push NotificationService image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.notification
+          push: true
+          tags: |
+            ghcr.io/mhalmaspoor/bookstore-notificationservice:${{ github.sha }}
+            ghcr.io/mhalmaspoor/bookstore-notificationservice:${{ github.ref_name }}
